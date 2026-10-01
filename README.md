@@ -11,7 +11,10 @@ Sistem manajemen laboratorium IoT berbasis web: manajemen inventaris komponen, p
 - Laporan inventaris/peminjaman/kerusakan/IoT dengan ekspor CSV
 - PWA: installable + offline shell (service worker via vite-plugin-pwa)
 - Integrasi ESP32: registrasi, heartbeat, dan pengiriman data sensor via API key khusus
-- Notifikasi in-app, audit log, deteksi device offline, penandaan peminjaman overdue
+- Notifikasi in-app, log audit lengkap (aktor, aksi, entitas, IP), deteksi device offline, penandaan peminjaman overdue
+- Customer Service: ticketing user ↔ admin dengan status, prioritas, dan thread balasan
+- QR Code label inventaris per komponen (PNG/SVG, siap cetak)
+- Pengujian otomatis (Vitest + Supertest): auth, RBAC, peminjaman, inventori, audit, ticketing
 
 ## Arsitektur
 
@@ -96,9 +99,21 @@ Login menerima **username, NIM, email, atau nomor HP** (field login berlabel `Us
 
 ## Testing
 
+Pengujian otomatis memakai **Vitest + Supertest** terhadap database terpisah (`ilms_test`), sehingga data demo `ilms_db` tidak tersentuh.
+
 ```bash
-cd backend && npm test          # (unit/existing integration examples)
+# sekali saja: buat database + schema untuk test
+docker exec ilms_postgres psql -U postgres -d postgres -c "CREATE DATABASE ilms_test;"
+cd backend
+$env:TEST_DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/ilms_test?schema=public"
+npm run test:db:setup
+
+# jalankan test
+npm test              # sekali jalan
+npm run test:watch    # mode watch
 ```
+
+Cakupan test: autentikasi (username/NIM/email/HP, password salah, token tidak valid), RBAC, alur peminjaman (stok, approve, pengembalian, 422 stok kurang), komponen + stok + QR Code, log audit, dan ticketing (ownership, balasan, perubahan status).
 
 ## Deployment (Production)
 

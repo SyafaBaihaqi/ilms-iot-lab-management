@@ -15,6 +15,7 @@ import dashboardRoutes from './routes/dashboard.routes';
 import reportRoutes from './routes/report.routes';
 import notificationRoutes from './routes/notification.routes';
 import ticketRoutes from './routes/ticket.routes';
+import auditRoutes from './routes/audit.routes';
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
 import { startAllJobs } from './jobs';
 
@@ -75,17 +76,25 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/tickets', ticketRoutes);
+app.use('/api/audit-logs', auditRoutes);
 
 // ===== 404 & Error Handler =====
 app.use(notFoundHandler);
 app.use(errorHandler);
 
 // ===== Start Server & Background Jobs =====
-if (process.env.NODE_ENV !== 'test') {
-  startAllJobs();
+// Hanya listen bila file ini dijalankan langsung (dev / `node dist/app.js`).
+// Di dalam test, app di-import tanpa membuka port.
+if (require.main === module) {
+  if (process.env.NODE_ENV !== 'test') {
+    startAllJobs();
+  }
+
+  app.listen(PORT, () => {
+    console.log(`🤖 ILMS Backend API running on http://localhost:${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/api/health`);
+  });
 }
 
-app.listen(PORT, () => {
-  console.log(`🤖 ILMS Backend API running on http://localhost:${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/api/health`);
-});
+export { app };
+export default app;

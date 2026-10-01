@@ -107,7 +107,71 @@ Auth Device: `X-API-Key: <device_api_key>`
 | PUT | `/api/notifications/:id/read` | JWT | Tandai dibaca |
 | PUT | `/api/notifications/read-all` | JWT | Tandai semua dibaca |
 
-## 10. Customer Service (Tiket)
+## 10. Log Audit
+
+Mencatat jejak perubahan data penting: aktor, aksi, entitas, ID, IP, dan detail perubahan (`metadata`). Dapat difilter dengan `search`, `entityType`, `action`, `userId`, dan rentang tanggal. **Admin only.**
+
+| Endpoint | Auth | Deskripsi |
+|---|---|---|
+| `GET /api/audit-logs` | JWT Admin | Daftar log audit (paginated, `page`, `limit` max 200) |
+| `GET /api/audit-logs/facets` | JWT Admin | Daftar entitas & aksi yang tersedia (untuk filter UI) |
+| `GET /api/audit-logs/:id` | JWT Admin | Detail satu log audit |
+
+Parameter query `GET /api/audit-logs`:
+
+| Parameter | Tipe | Keterangan |
+|---|---|---|
+| `search` | string | Cari di aksi, entitas, ID entitas, atau nama/username aktor |
+| `entityType` | string | Contoh: `Component`, `Loan`, `User`, `Device`, `Ticket`, `Category` |
+| `action` | string | Contoh: `component.adjust_stock`, `loan.approve` |
+| `userId` | uuid | Filter berdasarkan aktor |
+| `from` / `to` | ISO date | Rentang waktu aktivitas |
+
+Aksi yang tercatat: `component.create`, `component.update`, `component.delete`, `component.adjust_stock`, `loan.create`, `loan.approve`, `loan.reject`, `loan.return`, `loan.cancel`, `user.create`, `user.update`, `user.delete`, `category.create`, `category.update`, `category.delete`, `device.create`, `device.update`, `device.delete`, `ticket.create`, `ticket.reply`, `ticket.update_status`, `ticket.close`, `ticket.delete`.
+
+Contoh respons:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "action": "component.adjust_stock",
+      "entityType": "Component",
+      "entityId": "uuid",
+      "ipAddress": "103.28.14.5",
+      "metadata": { "quantity": 3, "transactionType": "OUT", "notes": "Dipinjam uji coba" },
+      "createdAt": "2026-10-01T09:56:19.000Z",
+      "user": { "id": "uuid", "username": "admin", "fullName": "Admin", "role": { "name": "Admin" } }
+    }
+  ],
+  "meta": { "total": 1, "page": 1, "limit": 25, "totalPages": 1 }
+}
+```
+
+## 11. QR Code Komponen
+
+| Endpoint | Auth | Deskripsi |
+|---|---|---|
+| `GET /api/components/:id/qrcode` | JWT Admin/User | QR Code label inventaris (PNG) |
+| `GET /api/components/:id/qrcode?format=svg` | JWT Admin/User | Versi SVG (untuk cetak vektor) |
+
+Isi QR berupa URL halaman inventori: `{FRONTEND_URL}/inventory?component={id}`.
+Respons berupa file gambar langsung (`Content-Type: image/png`), bukan JSON — gunakan `responseType: 'blob'` di axios.
+
+```ts
+const res = await api.get(`/components/${id}/qrcode`, { responseType: 'blob' });
+```
+
+| Status | Kode | Keterangan |
+|---|---|---|
+| 200 | — | File PNG/SVG dikembalikan |
+| 401 | `AUTH_REQUIRED` / `TOKEN_INVALID` | Token hilang atau tidak valid |
+| 404 | `COMPONENT_NOT_FOUND` | Komponen tidak ada atau nonaktif |
+
+## 12. Customer Service (Tiket)
 
 Base: `/api/tickets` · Status: `Open`, `In Progress`, `Resolved`, `Closed` · Prioritas: `Low`, `Medium`, `High`, `Urgent`
 

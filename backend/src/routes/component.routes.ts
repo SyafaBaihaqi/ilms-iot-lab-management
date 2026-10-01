@@ -9,6 +9,7 @@ router.use(authenticateJwt);
 
 router.get('/', ComponentController.getAll);
 router.get('/:id', ComponentController.getById);
+router.get('/:id/qrcode', ComponentController.getQrCode);
 router.get('/:id/history', requireAdmin, ComponentController.getStockHistory);
 router.post('/', requireAdmin, ComponentController.create);
 router.put('/:id', requireAdmin, ComponentController.update);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { request, parseError } from '../services/api';
+import api, { request, parseError } from '../services/api';
 import { Loading, EmptyState, StatusBadge, Pagination, Modal, Field } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
 
@@ -171,6 +171,28 @@ export default function InventoryPage() {
     }
   };
 
+  const [qrLoadingId, setQrLoadingId] = useState<string | null>(null);
+
+  const handleQrCode = async (c: Component) => {
+    setQrLoadingId(c.id);
+    setError('');
+    try {
+      const res = await api.get(`/components/${c.id}/qrcode`, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data as Blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `qr-${c.inventoryCode}.png`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      setError(err?.response?.data?.error || 'Gagal membuat QR Code.');
+    } finally {
+      setQrLoadingId(null);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -236,6 +258,7 @@ export default function InventoryPage() {
                 <th className="table-th">Kondisi</th>
                 <th className="table-th">Lokasi</th>
                 <th className="table-th">Status</th>
+                <th className="table-th">QR</th>
                 {isAdmin && <th className="table-th">Aksi</th>}
               </tr>
             </thead>
@@ -260,6 +283,16 @@ export default function InventoryPage() {
                   <td className="table-td">{c.location || '-'}</td>
                   <td className="table-td">
                     <StatusBadge value={c.status} />
+                  </td>
+                  <td className="table-td">
+                    <button
+                      className="text-indigo-600 hover:underline text-xs disabled:opacity-50"
+                      onClick={() => handleQrCode(c)}
+                      disabled={qrLoadingId === c.id}
+                      title={`Unduh QR Code ${c.inventoryCode}`}
+                    >
+                      {qrLoadingId === c.id ? 'Membuat...' : '⬇ QR'}
+                    </button>
                   </td>
                   {isAdmin && (
                     <td className="table-td">

@@ -295,9 +295,13 @@ model AuditLog {
   entityType String   @map("entity_type") @db.VarChar(50)
   entityId   String?  @map("entity_id")
   ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  metadata   Json?    @db.JsonB
   createdAt  DateTime @default(now()) @map("created_at")
 
   user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
+  @@index([entityType, entityId], map: "idx_audit_logs_entity")
+  @@index([createdAt(sort: Desc)], map: "idx_audit_logs_created_at")
+  @@index([userId], map: "idx_audit_logs_user_id")
   @@map("audit_logs")
 }

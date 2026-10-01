@@ -3,6 +3,7 @@ import { TicketService } from '../services/ticket.service';
 import { createTicketSchema, replyTicketSchema, updateTicketSchema } from '../validators/ticket.validator';
 import { sendSuccess } from '../utils/response';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
+import { auditRequest } from '../utils/audit';
 
 export class TicketController {
   static async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -47,6 +48,10 @@ export class TicketController {
     try {
       const validated = createTicketSchema.parse(req.body);
       const result = await TicketService.create(req.user!.userId, validated);
+      await auditRequest(req, 'ticket.create', 'Ticket', result.id, {
+        subject: validated.subject,
+        priority: validated.priority ?? null
+      });
       return sendSuccess(res, result, 'Ticket berhasil dibuat', 201);
     } catch (err) {
       next(err);
@@ -63,6 +68,9 @@ export class TicketController {
         isAdmin,
         validated.message
       );
+      await auditRequest(req, 'ticket.reply', 'Ticket', req.params.id, {
+        asAdmin: isAdmin
+      });
       return sendSuccess(res, result, 'Balasan berhasil dikirim', 201);
     } catch (err) {
       next(err);
@@ -73,6 +81,9 @@ export class TicketController {
     try {
       const validated = updateTicketSchema.parse(req.body);
       const result = await TicketService.updateStatus(req.params.id, req.user!.userId, validated);
+      await auditRequest(req, 'ticket.update_status', 'Ticket', req.params.id, {
+        changes: Object.keys(validated)
+      });
       return sendSuccess(res, result, 'Ticket berhasil diperbarui');
     } catch (err) {
       next(err);
@@ -83,6 +94,7 @@ export class TicketController {
     try {
       const isAdmin = req.user!.role === 'Admin';
       const result = await TicketService.closeOwn(req.params.id, req.user!.userId, isAdmin);
+      await auditRequest(req, 'ticket.close', 'Ticket', req.params.id);
       return sendSuccess(res, result, 'Ticket ditutup');
     } catch (err) {
       next(err);
@@ -93,6 +105,7 @@ export class TicketController {
     try {
       const isAdmin = req.user!.role === 'Admin';
       const result = await TicketService.remove(req.params.id, req.user!.userId, isAdmin);
+      await auditRequest(req, 'ticket.delete', 'Ticket', req.params.id);
       return sendSuccess(res, result, 'Ticket berhasil dihapus');
     } catch (err) {
       next(err);

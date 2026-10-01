@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { DeviceService } from '../services/device.service';
 import { registerDeviceSchema, updateDeviceSchema } from '../validators/device.validator';
 import { sendSuccess } from '../utils/response';
+import { auditRequest } from '../utils/audit';
+import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { DeviceRequest } from '../middlewares/apiKey.middleware';
 
 export class DeviceController {
@@ -14,10 +16,14 @@ export class DeviceController {
     }
   }
 
-  static async create(req: Request, res: Response, next: NextFunction) {
+  static async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const validated = registerDeviceSchema.parse(req.body);
       const result = await DeviceService.registerDevice(validated);
+      await auditRequest(req, 'device.create', 'Device', validated.esp32Id, {
+        esp32Id: validated.esp32Id,
+        deviceName: validated.deviceName
+      });
       return sendSuccess(res, result, 'Device created. Save the API key!', 201);
     } catch (err) {
       next(err);
@@ -33,19 +39,23 @@ export class DeviceController {
     }
   }
 
-  static async update(req: Request, res: Response, next: NextFunction) {
+  static async update(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const validated = updateDeviceSchema.parse(req.body);
       const result = await DeviceService.update(req.params.id, validated);
+      await auditRequest(req, 'device.update', 'Device', req.params.id, {
+        changes: Object.keys(validated)
+      });
       return sendSuccess(res, result, 'Device updated successfully');
     } catch (err) {
       next(err);
     }
   }
 
-  static async delete(req: Request, res: Response, next: NextFunction) {
+  static async delete(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       await DeviceService.delete(req.params.id);
+      await auditRequest(req, 'device.delete', 'Device', req.params.id);
       return sendSuccess(res, null, 'Device deleted successfully');
     } catch (err) {
       next(err);

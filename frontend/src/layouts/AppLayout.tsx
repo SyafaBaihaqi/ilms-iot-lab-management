@@ -10,6 +10,7 @@ const navItems = [
   { to: '/devices', label: 'Perangkat IoT', icon: '📡', roles: ['Admin'] },
   { to: '/sensors', label: 'Monitoring Sensor', icon: '📈', roles: ['Admin'] },
   { to: '/reports', label: 'Laporan', icon: '📄', roles: ['Admin'] },
+  { to: '/audit-logs', label: 'Log Audit', icon: '🕵️', roles: ['Admin'] },
   { to: '/support', label: 'Customer Service', icon: '🎧', roles: ['Admin', 'User'] },
   { to: '/users', label: 'Pengguna', icon: '👥', roles: ['Admin'] }
 ];

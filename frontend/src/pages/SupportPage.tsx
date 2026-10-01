@@ -33,7 +33,14 @@ interface TicketStats {
   Closed: number;
 }
 
-const STATUS_OPTIONS = ['', 'Open', 'In Progress', 'Resolved', 'Closed'];
+// Value = nilai enum Prisma yang dikirim ke API (bukan label tampilan).
+const STATUS_OPTIONS = ['', 'Open', 'In_Progress', 'Resolved', 'Closed'];
+const STATUS_LABEL: Record<string, string> = {
+  Open: 'Open',
+  In_Progress: 'In Progress',
+  Resolved: 'Resolved',
+  Closed: 'Closed'
+};
 const PRIORITY_OPTIONS = ['Low', 'Medium', 'High', 'Urgent'];
 
 export default function SupportPage() {
@@ -239,7 +246,7 @@ export default function SupportPage() {
                 status === s ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600'
               }`}
             >
-              {s || 'Semua'}
+              {s ? STATUS_LABEL[s] || s : 'Semua'}
             </button>
           ))}
         </div>
@@ -409,7 +416,7 @@ export default function SupportPage() {
                   <select className="input" value={adminStatus} onChange={(e) => setAdminStatus(e.target.value)}>
                     {STATUS_OPTIONS.filter(Boolean).map((s) => (
                       <option key={s} value={s}>
-                        {s}
+                        {STATUS_LABEL[s] || s}
                       </option>
                     ))}
                   </select>

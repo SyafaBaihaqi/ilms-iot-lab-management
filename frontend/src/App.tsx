@@ -9,6 +9,7 @@ import LoansPage from './pages/LoansPage';
 import DevicesPage from './pages/DevicesPage';
 import SensorsPage from './pages/SensorsPage';
 import ReportsPage from './pages/ReportsPage';
+import AuditLogsPage from './pages/AuditLogsPage';
 import UsersPage from './pages/UsersPage';
 import SupportPage from './pages/SupportPage';
 import ProfilePage from './pages/ProfilePage';
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="/devices" element={<DevicesPage />} />
             <Route path="/sensors" element={<SensorsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/audit-logs" element={<AuditLogsPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/support" element={<SupportPage />} />
             <Route path="/profile" element={<ProfilePage />} />
