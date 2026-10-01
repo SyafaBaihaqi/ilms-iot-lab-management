@@ -1,0 +1,259 @@
+============================================================
+ CARA MENJALANKAN PROJECT ILMS (IoT Lab Management System)
+============================================================
+
+Project terdiri dari 3 bagian utama:
+  1. Database PostgreSQL (via Docker)
+  2. Backend API (Node.js + Express + Prisma) - port 5000
+  3. Frontend PWA (React + Vite) - port 5173
+
+------------------------------------------------------------
+ SYARAT (PREREQUISITES)
+------------------------------------------------------------
+- Node.js (versi 16+ / disarankan 18 atau 20)
+- Docker Desktop (harus SUDAH DIBUKA dan status "Engine running")
+
+------------------------------------------------------------
+ LANGKAH 1 - JALANKAN DATABASE (Docker)
+------------------------------------------------------------
+Buka PowerShell, lalu arahkan ke folder project:
+
+    cd D:\Study\Prototype\ILMS
+
+Jalankan perintah berikut:
+
+    docker compose up -d
+
+Ini akan membuat dan menjalankan container PostgreSQL:
+    - Host: localhost
+    - Port: 5432
+    - User: postgres
+    - Password: postgres
+    - Database: ilms_db
+
+Cek apakah container berjalan:
+
+    docker ps
+
+Harus ada container bernama "ilms_postgres" dengan status Up.
+Catatan: pertama kali akan menarik image postgres:16-alpine
+(butuh internet dan beberapa menit).
+
+------------------------------------------------------------
+ LANGKAH 2 - BUAT TABEL & ISI DATA DEMO (sekali saja)
+------------------------------------------------------------
+Buka PowerShell baru, arahkan ke folder backend:
+
+    cd D:\Study\Prototype\ILMS\backend
+
+Buat tabel pada database:
+
+    npx prisma db push
+
+Isi data awal (user demo, kategori, komponen, device IoT):
+
+    npm run prisma:seed
+
+Konteks koneksi database sudah ada di file backend\.env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ilms_db?schema=public"
+(Tidak perlu diubah jika memakai Docker sesuai langkah 1)
+
+Catatan: langkah ini cukup dijalankan SEKALI. Jika database
+sudah pernah di-setup, langsung lanjut ke Langkah 3.
+
+------------------------------------------------------------
+ LANGKAH 3 - JALANKAN BACKEND (Terminal 1)
+------------------------------------------------------------
+    cd D:\Study\Prototype\ILMS\backend
+    npm run dev
+
+Tunggu sampai muncul tulisan:
+    "ILMS Backend API running on http://localhost:5000"
+
+Cek status kesehatannya di browser:
+    http://localhost:5000/api/health
+Harus menampilkan {"success":true,"status":"ok",...}
+
+------------------------------------------------------------
+ LANGKAH 4 - JALANKAN FRONTEND (Terminal 2)
+------------------------------------------------------------
+Buka PowerShell / terminal LAIN (jangan tutup Terminal 1):
+
+    cd D:\Study\Prototype\ILMS\frontend
+    npm run dev
+
+Akan muncul URL, biasanya:
+    http://localhost:5173
+
+------------------------------------------------------------
+ LANGKAH 5 - AKSES APLIKASI
+------------------------------------------------------------
+Buka browser dan masuk ke:
+    http://localhost:5173
+
+Login menggunakan akun demo:
+    Admin    -> username: admin       password: admin123
+    Mahasiswa-> username: mahasiswa1  password: user123
+
+Coba fitur:
+    - Sidebar icon-only (collapsed) di kiri, buka dengan
+      tombol "»" di bagian bawah sidebar.
+    - Dashboard, Inventori, Kategori, Peminjaman, Perangkat
+      IoT, Monitoring Sensor, Laporan, Pengguna.
+
+------------------------------------------------------------
+ SIMULASI DATA IOT (Opsional, tanpa hardware)
+------------------------------------------------------------
+Di PowerShell lain, kirim heartbeat device:
+
+    Invoke-RestMethod -Uri "http://localhost:5000/api/devices/heartbeat" -Method Post `
+      -Headers @{ "X-API-Key" = "ilms_esp32_dev_secret_key_123" } `
+      -ContentType "application/json" `
+      -Body '{"timestamp": 123456}'
+
+Kirim data sensor:
+
+    Invoke-RestMethod -Uri "http://localhost:5000/api/sensors/readings/batch" -Method Post `
+      -Headers @{ "X-API-Key" = "ilms_esp32_dev_secret_key_123" } `
+      -ContentType "application/json" `
+      -Body '{"readings":[{"sensorType":"temperature","value":29.4,"unit":"C"},{"sensorType":"humidity","value":68.2,"unit":"%"},{"sensorType":"distance","value":15.0,"unit":"cm"}]}'
+
+Lalu refresh halaman "Monitoring Sensor" (/sensors) untuk
+melihat data masuk secara real-time.
+
+------------------------------------------------------------
+ MENGHENTIKAN SERVER
+------------------------------------------------------------
+- Tutup kedua terminal (Ctrl+C pada masing-masing terminal).
+- Untuk menghentikan database Docker:
+      docker compose down
+  (Jika ingin menghapus data DB sekalian, gunakan -v:
+      docker compose down -v )
+
+------------------------------------------------------------
+ RESET DATABASE KE KONDISI AWAL (SEPERTI BARU)
+------------------------------------------------------------
+Gunakan ini untuk menghapus semua aktivitas/test (pinjaman,
+pengembalian, riwayat stok, notifikasi, audit log, data sensor,
+device/user/komponen tambahan) dan mengembalikan database seperti
+kondisi awal setelah seeding.
+
+!!! PERHATIAN: Semua data yang ada saat ini AKAN DIHAPUS
+    secara permanen dan tidak bisa di-undo. !!!
+
+Langkah:
+1. Pastikan Docker DB berjalan:
+       cd D:\Study\Prototype\ILMS
+       docker compose up -d
+
+2. HENTIKAN server backend (Tekan Ctrl+C pada terminal yang
+   menjalankan "npm run dev" untuk backend).
+
+3. Reset & buat ulang tabel, lalu isi ulang seed:
+       cd D:\Study\Prototype\ILMS\backend
+       npx prisma db push --force-reset
+       npm run prisma:seed
+   (Jika muncul konfirmasi, jawab y / yes)
+
+4. Jalankan ulang backend, lalu buka aplikasi:
+       npm run dev                              (Terminal backend)
+       cd D:\Study\Prototype\ILMS\frontend
+       npm run dev                              (Terminal frontend)
+       http://localhost:5173
+
+Data yang otomatis dikembalikan oleh seed:
+    - Roles : Admin, User
+    - Akun  : admin/admin123 dan mahasiswa1/user123
+    - 9 kategori, 72 komponen (5 demo + 67 komponen lab),
+      1 device IoT demo (API key: ilms_esp32_dev_secret_key_123)
+
+------------------------------------------------------------
+ TROUBLESHOOTING
+------------------------------------------------------------
+1. Prisma error "Can't reach database server"
+   -> Pastikan container postgres jalan: docker ps
+   -> Pastikan Docker Desktop sudah "Engine running".
+
+2. 401 Unauthorized saat panggil API
+   -> Kamu belum login / token kadaluarsa. Login ulang di UI.
+
+3. Halaman putih / error di salah satu menu
+   -> Pastikan Backend (npm run dev) masih berjalan.
+   -> Refresh browser (hard refresh: Ctrl+Shift+R).
+
+4. Port 5000/5173 sudah terpakai
+   -> Ubah PORT di backend\.env, atau atur server port di
+      frontend\vite.config.ts.
+
+5. npm run dev error "ts-node-dev not found"
+   -> Jalankan sekali:  npm install  (di folder backend)
+
+------------------------------------------------------------
+  PUBLISH KE INTERNET VIA CLOUDFLARE TUNNEL (GRATIS)
+------------------------------------------------------------
+Tujuan: website bisa diakses dari internet lewat subdomain
+milik sendiri, mis. https://ilms.lab-saya.com, dengan HTTPS
+otomatis, TANPA buka port di router.
+
+Alur:  Internet -> HTTPS (Cloudflare) -> tunnel (cloudflared)
+       -> http://localhost:4173 (frontend produksi + proxy /api)
+       -> http://localhost:5000 (backend) -> PostgreSQL
+
+A. SIAPKAN APLIKASI (sekali jalan otomatis)
+   Jalankan dari folder project:
+       powershell -ExecutionPolicy Bypass -File .\start-online.ps1
+   Skrip ini akan:
+     - Menyalakan PostgreSQL Docker (bila belum jalan)
+     - Menyalakan Backend (npm.cmd run dev)  -> port 5000
+     - Build frontend (bila belum ada dist/) lalu menjalankan
+       server online frontend (node serve-online.mjs) -> port 4173
+       Terikat ke 127.0.0.1 (IPv4) dan meneruskan /api -> :5000.
+       (bukan "vite preview", karena bind Vite preview hanya di ::1/IPv6
+       sehingga tidak terjangkau tunnel 127.0.0.1)
+
+B. PERSIAPAN CLOUDFLARE (dilakukan manual, sekali)
+   1) Daftar akun Cloudflare (gratis): dash.cloudflare.com
+   2) Tambahkan domain -> pilih paket Free -> ikuti ubah
+      nameserver sesuai petunjuk Cloudflare, tunggu status Active.
+   3) Install cloudflared Windows:
+        winget install --id Cloudflare.cloudflared -e
+      (atau unduh cloudflared-windows-amd64.exe ke C:\cloudflared\)
+   4) Login sekali:
+        cloudflared tunnel login
+      Pilih domain Anda di browser.
+
+C. BUAT TUNNEL & ROUTE DNS
+       cloudflared tunnel create ilms
+       cloudflared tunnel route dns ilms ilms.<domainAnda>
+   Catat <id-tunnel> yang muncul di layar.
+
+D. ISI FILE CONFIG
+   Salin deploy\cloudflared-config.template.yml ke
+   C:\Users\asust\.cloudflared\config.yml, lalu ganti
+   <domainAnda> dan <id-tunnel>.
+
+E. JALANKAN
+   Pastikan window dari start-online.ps1 masih hidup (port
+   4173 & 5000), lalu di terminal lain:
+       cloudflared tunnel run ilms
+   Tunggu "Registered tunnel connection", lalu buka:
+       https://ilms.<domainAnda>
+   Login akun admin, lalu ubah password demo lewat menu Profil
+   (ProfilePage) sebelum dipakai publik.
+
+Catatan:
+   - Tunnel & server mati saat PC/game off atau reboot.
+     (untuk produksi permanen, gunakan VPS + Docker + Caddy)
+   - Data tetap di PostgreSQL lokal, tidak ada port 5432 yang
+     diekspos ke internet.
+   - Apabila lupa menjalankan start-online.ps1, /api akan error
+     500 karena port 4173/5000 belum nyala.
+
+------------------------------------------------------------
+  TROUBLESHOOTING (ONLINE)
+
+Akun demo / default:
+   Admin     : admin     / admin123
+   Mahasiswa : mahasiswa1 / user123
+
+Selesai. Selamat mencoba!

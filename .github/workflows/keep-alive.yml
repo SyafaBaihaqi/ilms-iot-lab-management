@@ -1,0 +1,33 @@
+name: Keep Alive
+
+# Panggil /api/health setiap 10 menit agar instance Render Free
+# (yang tidur setelah 15 menit idle) tetap dalam keadaan hidup.
+# Isi repository secret API_BASE_URL, contoh:
+# https://ilms-backend.onrender.com/api
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit health endpoint
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+        run: |
+          if [ -z "$API_BASE_URL" ]; then
+            echo "Secret API_BASE_URL belum diisi - ping dilewati."
+            exit 0
+          fi
+          URL="${API_BASE_URL%/}/health"
+          echo "Mengecek $URL"
+          if curl -fsS --max-time 30 "$URL"; then
+            echo ""
+            echo "OK"
+          else
+            echo "Ping gagal (instance mungkin sedang bangun) - akan dicoba lagi 10 menit lagi."
+          fi

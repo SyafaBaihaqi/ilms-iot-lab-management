@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: ilms-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci && npx prisma generate && npm run build
+    startCommand: node dist/app.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: REFRESH_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: REFRESH_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGIN
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "60000"
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: "120"
+      - key: IOT_OFFLINE_THRESHOLD_MINUTES
+        value: "2"

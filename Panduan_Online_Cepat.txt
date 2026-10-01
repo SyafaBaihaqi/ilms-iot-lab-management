@@ -1,0 +1,92 @@
+============================================================
+ PANDUAN CEPAT - JALANKAN & PUBLISH WEBSITE KE INTERNET
+============================================================
+
+CARA PANGGIL UNTUK HOSTING 24/7 (gratis, tanpa cost):
+------------------------------------------------------------
+Panduan lengkap (Neon + Render + Vercel + keep-alive otomatis)
+ada di file:  docs\DEPLOYMENT.md
+
+=> Cara di bawah ini adalah mode LOKAL (PC menyala terus).
+   Untuk 24/7 sungguhan, ikuti docs\DEPLOYMENT.md.
+
+INI YANG PALING CEPAT (REKOMENDASI):
+------------------------------------------------------------
+1) Buka folder project:  D:\Study\Prototype\ILMS
+2) Double-click file  mulai-online.bat
+   -> otomatis menjalankan:
+      a) PostgreSQL (Docker)
+      b) Backend API        -> port 5000
+      c) Frontend Online    -> port 4173  (node serve-online.mjs)
+      d) Cloudflare Tunnel  -> menghubungkan internet
+3) Tunggu 10-20 detik, lalu buka:
+      https://ilms.saiasyap.my.id
+   (login: admin / admin123)
+
+
+CARA MANUAL (kalau mau paham tiap langkah):
+------------------------------------------------------------
+Buka 4 terminal terpisah:
+
+Terminal 1 - Database:
+    cd D:\Study\Prototype\ILMS
+    docker compose up -d
+
+Terminal 2 - Backend API (:5000):
+    cd D:\Study\Prototype\ILMS\backend
+    npm.cmd run dev
+    (muncul: "ILMS Backend API running on http://localhost:5000")
+
+Terminal 3 - Frontend Online (:4173):
+    cd D:\Study\Prototype\ILMS\frontend
+    npm.cmd run build          (sekali saja / bila dist belum ada)
+    node serve-online.mjs
+    (muncul: "ILMS online server running on http://127.0.0.1:4173")
+
+Terminal 4 - Cloudflare Tunnel:
+    cloudflared tunnel run ilms
+    (muncul: "Registered tunnel connection conns=1")
+
+Buka https://ilms.saiasyap.my.id
+
+
+EMAIL CEK (pakai browser di PC atau HP):
+------------------------------------------------------------
+- http://localhost:4173/api/health   -> {"success":true,...}
+- https://ilms.saiasyap.my.id        -> halaman login ILMS
+
+Ketiga hal yang HARUS tetap hidup selama online:
+  1) jendela Backend (:5000)
+  2) jendela Online Server (:4173)
+  3) jendela Cloudflare Tunnel
+
+Jika PC di-reboot, tinggal double-click mulai-online.bat lagi.
+
+
+MEMATIKAN / BERHENTI:
+------------------------------------------------------------
+- Tutup ketiga jendela (Backend, Online Server, Tunnel).
+- Stop database:  cd D:\Study\Prototype\ILMS  lalu  docker compose down
+
+
+TROUBLESHOOTING SINGKAT:
+------------------------------------------------------------
+- Halaman "502 Bad Gateway" di website:
+    Online Server (:4173) atau Backend (:5000) tidak hidup.
+    Nyalakan lagi (Terminal 3 & 2), tunnel tidak perlu di-restart.
+- "cloudflared not recognized":
+    Belum diinstall / PATH belum refresh.
+    Install:  winget install --id Cloudflare.cloudflared -e
+    Di PC ini lokasinya:  C:\Program Files (x86)\cloudflared\cloudflared.exe
+    (mulai-online.bat otomatis memakai lokasi ini)
+- Tunnel error di Terminal 4:
+    Pastikan tunnel pernah dibuat:
+        cloudflared tunnel create ilms
+        cloudflared tunnel route dns ilms ilms.saiasyap.my.id
+    dan file C:\Users\asust\.cloudflared\config.yml berisi:
+        tunnel: ilms
+        credentials-file: C:\Users\asust\.cloudflared\<id-tunnel>.json
+        ingress:
+          - hostname: ilms.saiasyap.my.id
+            service: http://127.0.0.1:4173
+          - service: http_status:404

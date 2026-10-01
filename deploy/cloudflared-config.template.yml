@@ -1,0 +1,17 @@
+# ============================================================
+#  CONFIGURASI CLOUDFLARE TUNNEL - ILMS
+#  Salin isi file ini ke: C:\Users\asust\.cloudflared\config.yml
+#  lalu ganti 3 placeholder:
+#    1. <domainAnda>            -> mis. lab-saya.com
+#    2. <id-tunnel>             -> ID tunnel dari perintah:
+#                                  cloudflared tunnel create ilms
+#  Sesuai contoh (jangan hapus baris lain):
+# ============================================================
+
+tunnel: ilms
+credentials-file: C:\Users\asust\.cloudflared\9d71e399-024f-435a-b1b4-1d9bc526a6cb.json
+
+ingress:
+  - hostname: ilms.saiasyap.my.id
+    service: http://localhost:4173
+  - service: http_status:404
