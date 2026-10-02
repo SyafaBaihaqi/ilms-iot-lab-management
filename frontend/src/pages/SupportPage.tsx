@@ -3,6 +3,35 @@ import { request, parseError } from '../services/api';
 import { Loading, EmptyState, StatusBadge, Pagination, Modal, Field, StatCard } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
 
+type SupportMode = 'admin' | 'user';
+
+function SupportLogo({ mode }: { mode: SupportMode }) {
+  const isAdmin = mode === 'admin';
+
+  return (
+    <div
+      className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm ${
+        isAdmin ? 'bg-gradient-to-br from-blue-600 to-blue-700' : 'bg-gradient-to-br from-emerald-500 to-emerald-600'
+      }`}
+      title={isAdmin ? 'Mode Admin - Kelola Tiket' : 'Mode User - Ajukan Tiket'}
+      aria-label={isAdmin ? 'Logo Customer Service Admin' : 'Logo Customer Service User'}
+    >
+      <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        {isAdmin ? (
+          <>
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+          </>
+        ) : (
+          <>
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+          </>
+        )}
+      </svg>
+    </div>
+  );
+}
+
 interface TicketMessage {
   id: string;
   message: string;
@@ -213,13 +242,16 @@ export default function SupportPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-bold text-slate-800">Customer Service</h2>
-          <p className="text-sm text-slate-500">
-            {isAdmin
-              ? 'Kelola seluruh tiket pertanyaan dari pengguna'
-              : 'Ajukan pertanyaan anytime, admin lab akan membalas di sini'}
-          </p>
+        <div className="flex items-center gap-3">
+          <SupportLogo mode={isAdmin ? 'admin' : 'user'} />
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">Customer Service</h2>
+            <p className="text-sm text-slate-500">
+              {isAdmin
+                ? 'Kelola seluruh tiket pertanyaan dari pengguna'
+                : 'Ajukan pertanyaan kapan saja, admin lab akan membalas di sini'}
+            </p>
+          </div>
         </div>
         <button className="btn btn-primary" onClick={openCreate}>
           + Ajukan Tiket
