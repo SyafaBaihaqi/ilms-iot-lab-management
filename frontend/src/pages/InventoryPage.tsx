@@ -60,8 +60,11 @@ export default function InventoryPage() {
   const [editing, setEditing] = useState<Component | null>(null);
   const [form, setForm] = useState({ ...emptyForm });
   const [sortBy, setSortBy] = useState('createdAt_desc');
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const [scanned, setScanned] = useState<Component | null>(null);
+  const scanHandledRef = useRef<string | null>(null);
+  const setSearchParamsRef = useRef(setSearchParams);
+  setSearchParamsRef.current = setSearchParams;
 
   const tableWrapRef = useRef<HTMLDivElement>(null);
   const lastWheelFlip = useRef(0);
@@ -129,9 +132,18 @@ export default function InventoryPage() {
   // QR yang dipindai membuka /inventory?component=<id>.
   // Ambil datanya langsung (bukan lewat search) supaya pasti ketemu,
   // lalu saring tabel ke kode inventori + sorot barisnya.
+  //
+  // PENTING: param dibaca dari window.location, dan efek sengaja
+  // tanpa dependency. Kalau searchParams ikut jadi dependency,
+  // setSearchParams untuk melucuti query memicu efek ulang, cleanup
+  // men-set cancelled = true, lalu respons fetch dibuang dan banner
+  // tidak pernah muncul. Setter disimpan di ref supaya identitasnya
+  // tidak pernah jadi pemicu efek ulang. Guard ref menjaga satu id
+  // hanya diproses sekali.
   useEffect(() => {
-    const componentId = searchParams.get('component');
-    if (!componentId) return;
+    const componentId = new URLSearchParams(window.location.search).get('component');
+    if (!componentId || scanHandledRef.current === componentId) return;
+    scanHandledRef.current = componentId;
 
     let cancelled = false;
     setLoading(true);
@@ -144,21 +156,25 @@ export default function InventoryPage() {
         setScanned(data);
         setSearch(data.inventoryCode || '');
         setPage(1);
-      } catch (err) {
+      } catch (err: any) {
         if (!cancelled) {
           setScanned(null);
-          setError(parseError(err) || 'Komponen dari QR tidak ditemukan.');
+          setError(
+            err?.response?.status === 404
+              ? 'Komponen dari QR tidak ditemukan. Pastikan label QR berasal dari inventori ini.'
+              : parseError(err)
+          );
         }
       } finally {
         if (!cancelled) setLoading(false);
       }
     })();
 
-    setSearchParams({}, { replace: true });
+    setSearchParamsRef.current({}, { replace: true });
     return () => {
       cancelled = true;
     };
-  }, [searchParams, setSearchParams]);
+  }, []);
 
   const clearScanned = () => {
     setScanned(null);

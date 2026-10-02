@@ -29,3 +29,8 @@ services:
         value: "120"
       - key: IOT_OFFLINE_THRESHOLD_MINUTES
         value: "2"
+      # URL frontend produksi. WAJIB diisi manual: tanpa ini QR Code label
+      # inventaris akan menunjuk ke http://localhost:5173 dan tidak bisa
+      # dibuka dari HP pemindai.
+      - key: FRONTEND_URL
+        sync: false
