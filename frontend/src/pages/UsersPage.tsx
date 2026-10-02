@@ -7,6 +7,7 @@ interface User {
   fullName: string;
   email: string;
   username: string;
+  nim?: string;
   phone?: string;
   isActive: boolean;
   role?: { name: string };
@@ -25,6 +26,7 @@ export default function UsersPage() {
     fullName: '',
     email: '',
     username: '',
+    nim: '',
     password: '',
     phone: '',
     roleName: 'User'
@@ -52,7 +54,7 @@ export default function UsersPage() {
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ fullName: '', email: '', username: '', password: '', phone: '', roleName: 'User' });
+    setForm({ fullName: '', email: '', username: '', nim: '', password: '', phone: '', roleName: 'User' });
     setError('');
     setModalOpen(true);
   };
@@ -63,6 +65,7 @@ export default function UsersPage() {
       fullName: u.fullName,
       email: u.email,
       username: u.username,
+      nim: u.nim || '',
       password: '',
       phone: u.phone || '',
       roleName: u.role?.name || 'User'
@@ -79,12 +82,13 @@ export default function UsersPage() {
         await request('PUT', `/users/${editing.id}`, {
           fullName: form.fullName,
           email: form.email,
+          nim: form.nim || null,
           phone: form.phone,
           roleName: form.roleName,
           password: form.password || undefined
         });
       } else {
-        await request('POST', '/users', form);
+        await request('POST', '/users', { ...form, nim: form.nim || undefined });
       }
       setModalOpen(false);
       fetchData();
@@ -117,7 +121,7 @@ export default function UsersPage() {
 
       <input
         className="input max-w-xs"
-        placeholder="Cari nama / username / email..."
+        placeholder="Cari nama / username / NIM / email..."
         value={search}
         onChange={(e) => {
           setSearch(e.target.value);
@@ -138,6 +142,7 @@ export default function UsersPage() {
               <tr>
                 <th className="table-th">Nama</th>
                 <th className="table-th">Username</th>
+                <th className="table-th">NIM / NIDN</th>
                 <th className="table-th">Email</th>
                 <th className="table-th">Role</th>
                 <th className="table-th">Status</th>
@@ -149,6 +154,7 @@ export default function UsersPage() {
                 <tr key={u.id} className="hover:bg-slate-50">
                   <td className="table-td font-medium text-slate-800">{u.fullName}</td>
                   <td className="table-td">{u.username}</td>
+                  <td className="table-td">{u.nim || <span className="text-slate-300">-</span>}</td>
                   <td className="table-td">{u.email}</td>
                   <td className="table-td">
                     <StatusBadge value={u.role?.name || '-'} />
@@ -185,10 +191,19 @@ export default function UsersPage() {
             <Field label="Username">
               <input className="input" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required disabled={!!editing} />
             </Field>
-            <Field label="Email">
-              <input className="input" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+            <Field label="NIM / NIDN">
+              <input
+                className="input"
+                value={form.nim}
+                onChange={(e) => setForm({ ...form, nim: e.target.value })}
+                placeholder="Contoh: 2022101"
+                maxLength={20}
+              />
             </Field>
           </div>
+          <Field label="Email">
+            <input className="input" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+          </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label={editing ? 'Password (opsional)' : 'Password'}>
               <input
@@ -200,16 +215,19 @@ export default function UsersPage() {
                 minLength={6}
               />
             </Field>
-            <Field label="Role">
-              <select className="input" value={form.roleName} onChange={(e) => setForm({ ...form, roleName: e.target.value })}>
-                <option value="User">User / Mahasiswa</option>
-                <option value="Admin">Admin</option>
-              </select>
+            <Field label="Telepon">
+              <input className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </Field>
           </div>
-          <Field label="Telepon">
-            <input className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <Field label="Role">
+            <select className="input" value={form.roleName} onChange={(e) => setForm({ ...form, roleName: e.target.value })}>
+              <option value="User">User / Mahasiswa</option>
+              <option value="Admin">Admin</option>
+            </select>
           </Field>
+          <p className="text-xs text-slate-500">
+            NIM opsional, tapi bisa dipakai sebagai pengganti username saat login (mis. 2022101). Harus unik.
+          </p>
           <div className="flex gap-2 pt-2">
             <button type="button" className="btn btn-secondary flex-1" onClick={() => setModalOpen(false)}>
               Batal

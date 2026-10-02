@@ -27,10 +27,42 @@ Auth Device: `X-API-Key: <device_api_key>`
 
 | Method | Endpoint | Deskripsi |
 |---|---|---|
-| GET | `/api/users?search=&page=&limit=` | List user |
-| POST | `/api/users` | Buat user `{ fullName, email, username, password, roleName }` |
-| PUT | `/api/users/:id` | Update, termasuk `password` (opsional) & `roleName` |
+| GET | `/api/users?search=&page=&limit=` | List user (kolom respons memuat `nim`) |
+| POST | `/api/users` | Buat user `{ fullName, email, username, password, nim?, phone?, roleName }` |
+| PUT | `/api/users/:id` | Update, termasuk `password` (opsional), `nim`, `roleName` |
 | DELETE | `/api/users/:id` | Soft delete / nonaktifkan |
+
+Field `nim` (NIM/NIDN):
+
+| Aturan | Nilai |
+|---|---|
+| Wajib | Tidak (boleh `null` / tidak dikirim) |
+| Panjang | Maksimal 20 karakter |
+| Karakter | Huruf, angka, titik, `-`, `/` |
+| Unik | Ya (duplikat → `409 USER_EXISTS`) |
+| Fungsi | Bisa dipakai sebagai identifier saat login |
+
+`GET /api/users?search=` mencari di `fullName`, `username`, `email`, **dan** `nim`.
+
+Contoh:
+
+```json
+POST /api/users
+{
+  "fullName": "Budi Santoso",
+  "email": "budi@student.test",
+  "username": "budi",
+  "password": "budi12345",
+  "nim": "2210999",
+  "phone": "081200000001",
+  "roleName": "User"
+}
+```
+
+```json
+PUT /api/users/:id
+{ "nim": null }        // kosongkan NIM
+```
 
 ## 3. Categories
 

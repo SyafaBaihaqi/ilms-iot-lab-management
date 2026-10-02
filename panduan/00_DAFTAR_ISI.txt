@@ -19,9 +19,10 @@
                                         domain publik)
  03_DATABASE_Prisma.txt .............. Setting up database, seed
                                         data demo, reset total
- 04_TESTING_Otomatis.txt .............. Menjalankan 45 test
+ 04_TESTING_Otomatis.txt .............. Menjalankan 58 test
                                         otomatis (login, RBAC,
-                                        peminjaman, QR, audit)
+                                        peminjaman, QR, audit,
+                                        NIM pengguna)
  05_DEBUGGING_Troubleshooting.txt ..... Semua error & solusinya
                                         (WAJIB baca kalau ada
                                         masalah)

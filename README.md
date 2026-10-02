@@ -113,7 +113,7 @@ npm test              # sekali jalan
 npm run test:watch    # mode watch
 ```
 
-Cakupan test: autentikasi (username/NIM/email/HP, password salah, token tidak valid), RBAC, alur peminjaman (stok, approve, pengembalian, 422 stok kurang), komponen + stok + QR Code, log audit, dan ticketing (ownership, balasan, perubahan status).
+Cakupan test: autentikasi (username/NIM/email/HP, password salah, token tidak valid), RBAC, alur peminjaman (stok, approve, pengembalian, 422 stok kurang), komponen + stok + QR Code, log audit, ticketing (ownership, balasan, perubahan status), dan manajemen pengguna (NIM unik/opsional, login pakai NIM).
 
 ## Deployment (Production)
 
@@ -134,7 +134,7 @@ Semua panduan dipisah per kategori di folder **`panduan/`**:
 | `panduan/01_MENJALANKAN_Lokal.txt` | Menjalankan lokal (Docker + backend :5000 + frontend :5173) |
 | `panduan/02_MENJALANKAN_Online.txt` | Menjalankan online (bat file, tunnel, domain publik) |
 | `panduan/03_DATABASE_Prisma.txt` | Koneksi DB, `prisma db push`, seed, reset total |
-| `panduan/04_TESTING_Otomatis.txt` | Menjalankan 45 test otomatis (Vitest + Supertest) |
+| `panduan/04_TESTING_Otomatis.txt` | Menjalankan 58 test otomatis (Vitest + Supertest) |
 | `panduan/05_DEBUGGING_Troubleshooting.txt` | Semua error & solusinya (PowerShell, port, DB, tunnel) |
 | `panduan/06_DEPLOYMENT_Gratis_24-7.txt` | Hosting permanen gratis (Neon + Render + Vercel) |
 | `panduan/07_AKUN_DEMO_dan_URL.txt` | Akun demo, URL penting, API key IoT, endpoint demo |

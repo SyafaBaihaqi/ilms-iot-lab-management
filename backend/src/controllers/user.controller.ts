@@ -4,12 +4,14 @@ import { sendSuccess } from '../utils/response';
 import { auditRequest } from '../utils/audit';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { z } from 'zod';
+import { nimSchema } from '../validators/auth.validator';
 
 const createUserSchema = z.object({
   fullName: z.string().min(2),
   email: z.string().email(),
   username: z.string().min(3),
   password: z.string().min(6),
+  nim: nimSchema,
   phone: z.string().optional(),
   roleName: z.enum(['Admin', 'User'])
 });
@@ -17,6 +19,7 @@ const createUserSchema = z.object({
 const updateUserSchema = z.object({
   fullName: z.string().min(2).optional(),
   email: z.string().email().optional(),
+  nim: nimSchema,
   phone: z.string().optional(),
   isActive: z.boolean().optional(),
   roleName: z.enum(['Admin', 'User']).optional(),

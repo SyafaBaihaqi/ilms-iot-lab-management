@@ -1,7 +1,7 @@
-============================================================
+﻿============================================================
  04 - TESTING OTOMATIS (VITEST + SUPERTEST)
 ============================================================
- Project punya 45 test otomatis yang memverifikasi backend
+ Project punya 58 test otomatis yang memverifikasi backend
  dari sisi API (tanpa membuka browser).
 
  Framework : Vitest  +  Supertest
@@ -45,8 +45,8 @@
      test:db:setup : prisma db push --skip-generate
 
  Output sukses yang diharapkan:
-     Test Files  5 passed (5)
-     Tests      45 passed (45)
+     Test Files  6 passed (6)
+     Tests      58 passed (58)
 
  CATATAN PENTING:
   Database test harus punya schema yang sudah di-push.
@@ -91,7 +91,18 @@
                            bukan "In Progress" dengan spasi)
      Tiket ............... tutup tiket
 
-  Totalnya 45 test, sudah semua lulus.
+  user.test.ts ........... (13 test)
+     User ............... buat user dengan NIM
+     User ............... NIM bisa dipakai untuk login
+     User ............... NIM muncul di /api/auth/me
+     User ............... NIM wajib unik (duplikat ditolak 409)
+     User ............... NIM opsional (null untuk admin)
+     User ............... NIM invalid ditolak (400)
+     User ............... pencarian user berdasarkan NIM
+     User ............... NIM bisa diubah / dikosongkan saat edit
+     User ............... audit log mencatat pembuatan user
+
+  Totalnya 58 test, sudah semua lulus.
 
 ------------------------------------------------------------
  4. MENJALANKAN SATU FILE TEST SAJA
@@ -119,14 +130,15 @@
          npm test
 
 ------------------------------------------------------------
- 6. DAFTAR TEST YANG SUDAH DILULUSKAN (per 10/2026)
+  6. DAFTAR TEST YANG SUDAH DILULUSKAN
 ============================================================
-     auth.test.ts ..... 9/9  PASS
-     rbac.test.ts ..... 6/6  PASS
-     component.test.ts  9/9  PASS
-     loan.test.ts ..... 9/9  PASS
-     ticket.test.ts ... 12/12 PASS
-     TOTAL ........... 45/45 PASS
+     auth.test.ts .......  9/9  PASS
+     rbac.test.ts .......  6/6  PASS
+     component.test.ts ..  9/9  PASS
+     loan.test.ts .......  9/9  PASS
+     ticket.test.ts ..... 12/12 PASS
+     user.test.ts ...... 13/13 PASS
+     TOTAL ............ 58/58 PASS
 
 ============================================================
  Lanjut: ada test yang gagal? -> 05_DEBUGGING_Troubleshooting.txt

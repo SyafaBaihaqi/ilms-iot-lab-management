@@ -12,7 +12,8 @@ export class UserService {
       where.OR = [
         { fullName: { contains: options.search, mode: 'insensitive' } },
         { username: { contains: options.search, mode: 'insensitive' } },
-        { email: { contains: options.search, mode: 'insensitive' } }
+        { email: { contains: options.search, mode: 'insensitive' } },
+        { nim: { contains: options.search, mode: 'insensitive' } }
       ];
     }
 
@@ -28,6 +29,7 @@ export class UserService {
           fullName: true,
           email: true,
           username: true,
+          nim: true,
           phone: true,
           isActive: true,
           createdAt: true,
@@ -42,12 +44,18 @@ export class UserService {
     };
   }
 
-  static async create(data: { fullName: string; email: string; username: string; password: string; phone?: string; roleName: 'Admin' | 'User' }) {
+  static async create(data: { fullName: string; email: string; username: string; password: string; nim?: string | null; phone?: string; roleName: 'Admin' | 'User' }) {
     const existing = await prisma.user.findFirst({
-      where: { OR: [{ email: data.email }, { username: data.username }] }
+      where: {
+        OR: [
+          { email: data.email },
+          { username: data.username },
+          ...(data.nim ? [{ nim: data.nim }] : [])
+        ]
+      }
     });
     if (existing) {
-      throw { statusCode: 409, message: 'Email or username already exists', code: 'USER_EXISTS' };
+      throw { statusCode: 409, message: 'Email, username, or NIM already exists', code: 'USER_EXISTS' };
     }
 
     const role = await prisma.role.findUnique({ where: { name: data.roleName } });
@@ -62,6 +70,7 @@ export class UserService {
         email: data.email,
         username: data.username,
         passwordHash,
+        nim: data.nim || null,
         phone: data.phone,
         roleId: role.id
       },
@@ -73,6 +82,18 @@ export class UserService {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw { statusCode: 404, message: 'User not found', code: 'USER_NOT_FOUND' };
+    }
+
+    // NIM harus unik; dicegah sebelum update agar pesan errornya jelas.
+    if (data.nim !== undefined) {
+      const nim = data.nim || null;
+      if (nim && nim !== user.nim) {
+        const duplicate = await prisma.user.findFirst({ where: { nim, NOT: { id } } });
+        if (duplicate) {
+          throw { statusCode: 409, message: 'NIM already exists', code: 'USER_EXISTS' };
+        }
+      }
+      data.nim = nim;
     }
 
     if (data.roleName) {

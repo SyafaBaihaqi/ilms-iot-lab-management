@@ -45,7 +45,9 @@ export default function ProfilePage() {
           <div>
             <h3 className="text-lg font-semibold text-slate-800">{user?.fullName}</h3>
             <p className="text-sm text-slate-500">@{user?.username} · {user?.role}</p>
+            {user?.nim && <p className="text-sm text-slate-500">NIM/NIDN: {user.nim}</p>}
             <p className="text-sm text-slate-500">{user?.email}</p>
+            {user?.phone && <p className="text-sm text-slate-500">{user.phone}</p>}
           </div>
         </div>
       </div>

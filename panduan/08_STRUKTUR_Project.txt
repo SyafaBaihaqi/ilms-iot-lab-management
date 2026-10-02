@@ -21,7 +21,7 @@
   |    |    +-- validators/ ....... validasi input (zod)
   |    |    +-- utils/ ............ helper (response, audit, dll)
   |    |    +-- jobs/ ............. scheduled job (pangku)
-  |    +-- tests/ ............. 45 test otomatis (Vitest)
+  |    +-- tests/ ............. 58 test otomatis (Vitest)
   |    +-- vitest.config.mts .. konfigurasi test
   |    +-- .env ................ kredensial lokal (jangan di-commit)
   |    +-- .env.example ....... contoh kredensial (aman di-commit)

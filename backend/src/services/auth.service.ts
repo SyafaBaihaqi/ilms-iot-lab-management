@@ -46,6 +46,7 @@ export class AuthService {
         id: user.id,
         fullName: user.fullName,
         username: user.username,
+        nim: user.nim,
         email: user.email,
         role: user.role.name,
         phone: user.phone,
@@ -59,17 +60,22 @@ export class AuthService {
     email: string;
     username: string;
     password: string;
+    nim?: string | null;
     phone?: string;
     roleName: 'Admin' | 'User';
   }) {
     const existing = await prisma.user.findFirst({
       where: {
-        OR: [{ email: data.email }, { username: data.username }]
+        OR: [
+          { email: data.email },
+          { username: data.username },
+          ...(data.nim ? [{ nim: data.nim }] : [])
+        ]
       }
     });
 
     if (existing) {
-      throw { statusCode: 409, message: 'Email or username already exists', code: 'USER_EXISTS' };
+      throw { statusCode: 409, message: 'Email, username, or NIM already exists', code: 'USER_EXISTS' };
     }
 
     let role = await prisma.role.findUnique({ where: { name: data.roleName } });
@@ -87,6 +93,7 @@ export class AuthService {
         email: data.email,
         username: data.username,
         passwordHash,
+        nim: data.nim || null,
         phone: data.phone,
         roleId: role.id
       },
@@ -98,6 +105,7 @@ export class AuthService {
       fullName: newUser.fullName,
       email: newUser.email,
       username: newUser.username,
+      nim: newUser.nim,
       role: newUser.role.name
     };
   }
@@ -163,6 +171,7 @@ export class AuthService {
       fullName: user.fullName,
       email: user.email,
       username: user.username,
+      nim: user.nim,
       phone: user.phone,
       photoUrl: user.photoUrl,
       role: user.role.name,

@@ -24,6 +24,9 @@
  TIPS:
   - Admin = akun demo. Jangan lupa ganti passwordnya (atau
     biarkan untuk demo) lewat menu  Profil.
+  - Menu  Manajemen Pengguna  (Admin) punya kolom NIM/NIDN.
+    Field ini OPSIONAL, tapi WAJIB unik, dan bisa dipakai
+    untuk login (mis. ketik  2022101  di kolom username).
   - Role 'User' (mahasiswa1/user) TIDAK bisa buka Log Audit
     maupun menu Pengguna. Endpoint /api/audit-logs hanya
     untuk Admin.
