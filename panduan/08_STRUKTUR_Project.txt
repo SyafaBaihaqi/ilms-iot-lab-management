@@ -1,0 +1,139 @@
+============================================================
+ 08 - STRUKTUR PROJECT & TEKNOLOGI
+============================================================
+ Gambaran umum isi folder ILMS supaya Anda tidak bingung
+ mencari file.
+
+------------------------------------------------------------
+ 1. STRUKTUR FOLDER (ringkas)
+------------------------------------------------------------
+ ILMS/
+  +-- backend/ ............... API Node.js/Express/Prisma
+  |    +-- prisma/
+  |    |    +-- schema.prisma .... definisi semua tabel & relasi
+  |    |    +-- seed.ts ......... data demo (akun, barang, device)
+  |    +-- src/
+  |    |    +-- app.ts ............ entrypoint + daftar route
+  |    |    +-- routes/ ........... definisi URL per fitur
+  |    |    +-- controllers/ ...... logika Endpoint (req/res)
+  |    |    +-- services/ ......... logika bisnis + query Prisma
+  |    |    +-- middlewares/ ...... auth JWT, cek role, rate limit
+  |    |    +-- validators/ ....... validasi input (zod)
+  |    |    +-- utils/ ............ helper (response, audit, dll)
+  |    |    +-- jobs/ ............. scheduled job (pangku)
+  |    +-- tests/ ............. 45 test otomatis (Vitest)
+  |    +-- vitest.config.mts .. konfigurasi test
+  |    +-- .env ................ kredensial lokal (jangan di-commit)
+  |    +-- .env.example ....... contoh kredensial (aman di-commit)
+  |
+  +-- frontend/ ............. UI React + Vite + Tailwind + PWA
+  |    +-- src/
+  |    |    +-- pages/ ........... 1 file per halaman/menu
+  |    |    +-- components/ ..... komponen UI yang dipakai ulang
+  |    |    +-- layouts/ ........ kerangka (sidebar + header)
+  |    |    +-- services/ ....... axios client (api.ts)
+  |    |    +-- types/ .......... tipe TypeScript
+  |    |    +-- App.tsx ......... daftar route frontend
+  |    +-- public/
+  |    |    +-- _redirects ...... fallback SPA untuk Netlify
+  |    |    +-- icons/ .......... icon PWA
+  |    +-- dist/ .............. hasil build frontend (auto)
+  |    +-- serve-online.mjs ... server statis + proxy /api (:4173)
+  |    +-- vite.config.ts .... proxy dev & config PWA
+  |    +-- vercel.json ........ config deploy Vercel
+  |
+  +-- iot/ .................. kode ESP32 (firmware)
+  |    +-- esp32/
+  |         +-- config.example.h ... template konfigurasi
+  |         +-- config.h ........... kredensial (jangan di-commit)
+  |
+  +-- docs/ ................. dokumentasi markdown
+  |    +-- API.md .............. semua endpoint
+  |    +-- DEPLOYMENT.md ....... hosting Neon/Render/Vercel
+  |
+  +-- database/ ............. schema.sql (dump struktur)
+  +-- deploy/ ................ template konfigurasi cloudflared
+  +-- panduan/ .............. DOKUMENTASI INI (kategori per file)
+  |    +-- arsip/ ............. versi lama panduan (arsip)
+  |
+  +-- mulai-online.bat ...... 1-klik online
+  +-- start-online.ps1 ...... versi PowerShell
+  +-- docker-compose.yml .... database PostgreSQL
+  +-- render.yaml ........... config deploy Render (backend)
+  +-- README.md ............. dokumentasi utama
+  +-- ILMS_Blueprint.md ..... rancangan/arsitektur sistem
+
+------------------------------------------------------------
+ 2. TEKNOLOGI YANG DIPAKAI
+------------------------------------------------------------
+ BACKEND
+   Node.js + Express ......... REST API
+   Prisma ORM ................ akses database (aman dari SQL injection)
+   JWT + refresh token ....... autentikasi
+   bcrypt .................... hash password
+   zod ...................... validasi input
+   qrcode ................... generate QR Code (PNG/SVG)
+   helmet + cors + rate-limit keamanan (header, CORS, throttle)
+   bcryptjs ................. hash password
+   vitest + supertest ........ test otomatis
+
+ FRONTEND
+   React 18 + TypeScript ..... UI
+   Vite ..................... build tool (cepat)
+   Tailwind CSS ............. styling
+   axios .................... HTTP client
+   vite-plugin-pwa .......... PWA (bisa install di HP, offline cache)
+
+ DATABASE
+   PostgreSQL 16 ............ database relasional
+   (via Docker secara lokal, Neon secara online)
+
+ IOT
+   ESP32 + Arduino ........... deviceIoT
+   REST API + API Key ........ komunikasi device -> server
+
+ INFRA
+   Docker ................... container untuk PostgreSQL
+   Cloudflare Tunnel ........ publish ke internet tanpa buka port
+   Render + Vercel + Neon .... hosting permanen gratis
+   GitHub Actions ............ keep-alive Render
+
+------------------------------------------------------------
+ 3. ALUR REQUEST (ringkas)
+------------------------------------------------------------
+  Browser  ->  frontend (:4173 / :5173)
+                 |  axios request ke /api/...
+                 v
+           serve-online.mjs / vite proxy  -->  backend (:5000)
+                                              |  authenticateJwt
+                                              |  requireRole / requireAdmin
+                                              |  validator (zod)
+                                              v
+                                          Service  -->  Prisma  -->  PostgreSQL
+                                              |
+                                              v
+                                    audit.service (catat jejak)
+                                              |
+                                              v
+                                   response JSON  ->  Browser
+
+------------------------------------------------------------
+ 4. FITUR YANG SUDAH ADA
+------------------------------------------------------------
+  Auth ............. login (username/NIM/email/HP), refresh token
+  Dashboard ........ statistik real-time
+  CRUD ............ kategori, barang/inventori, pengguna
+  Peminjaman ....... create, approve, return, riwayat
+  Stok ............. penyesuaian stok + riwayat (audit trail)
+  QR Code .......... label QR per barang (PNG/SVG)
+  IoT .............. perangkat, heartbeat, deteksi offline
+  Sensor ........... data sensor + grafik real-time
+  Laporan .......... inventori, peminjaman, kerusakan, IoT (JSON/CSV)
+  Customer Service  tiket + balasan antar user & admin
+  Log Audit ........ jejak perubahan data (siapa, kapan, apa)
+  Notifikasi ....... in-app (bell icon)
+  PWA .............. bisa di-install di HP
+
+============================================================
+ Lanjut: perintah cepat -> 09_CHEATSHEET_Perintah.txt
+============================================================

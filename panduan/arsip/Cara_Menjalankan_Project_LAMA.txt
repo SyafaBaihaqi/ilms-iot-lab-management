@@ -1,4 +1,20 @@
 ============================================================
+ [ARSIP - VERSI LAMA] File ini sudah TIDAK DIPAKAI lagi.
+ Dipindahkan dari root project ke folder arsip/ pada 2 Okt 2026.
+ Dokumentasi resmi & terbaru ada di folder  panduan\  :
+     00_DAFTAR_ISI.txt
+     01_MENJALANKAN_Lokal.txt
+     02_MENJALANKAN_Online.txt
+     03_DATABASE_Prisma.txt
+     04_TESTING_Otomatis.txt
+     05_DEBUGGING_Troubleshooting.txt
+     06_DEPLOYMENT_Gratis_24-7.txt
+     07_AKUN_DEMO_dan_URL.txt
+     08_STRUKTUR_Project.txt
+     09_CHEATSHEET_Perintah.txt
+ Disimpan hanya sebagai referensi/riwayat.
+============================================================
+============================================================
  CARA MENJALANKAN PROJECT ILMS (IoT Lab Management System)
 ============================================================
 

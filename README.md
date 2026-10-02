@@ -121,12 +121,29 @@ Paket **gratis** (Neon + Render + Vercel + GitHub Actions keep-alive), jalur VPS
 troubleshooting ada di **`docs/DEPLOYMENT.md`**. Domain produksi: `ilms.saiasyap.my.id`.
 
 Untuk demo lokal tanpa hosting: double-click `mulai-online.bat`
-(atau ikuti `Panduan_Online_Cepat.txt`) — menjalankan PostgreSQL, backend, server frontend,
+(atau ikuti `panduan/02_MENJALANKAN_Online.txt`) — menjalankan PostgreSQL, backend, server frontend,
 dan Cloudflare Tunnel sekaligus.
+
+## Dokumentasi (`panduan/`)
+
+Semua panduan dipisah per kategori di folder **`panduan/`**:
+
+| File | Isi |
+|---|---|
+| `panduan/00_DAFTAR_ISI.txt` | Daftar isi semua panduan |
+| `panduan/01_MENJALANKAN_Lokal.txt` | Menjalankan lokal (Docker + backend :5000 + frontend :5173) |
+| `panduan/02_MENJALANKAN_Online.txt` | Menjalankan online (bat file, tunnel, domain publik) |
+| `panduan/03_DATABASE_Prisma.txt` | Koneksi DB, `prisma db push`, seed, reset total |
+| `panduan/04_TESTING_Otomatis.txt` | Menjalankan 45 test otomatis (Vitest + Supertest) |
+| `panduan/05_DEBUGGING_Troubleshooting.txt` | Semua error & solusinya (PowerShell, port, DB, tunnel) |
+| `panduan/06_DEPLOYMENT_Gratis_24-7.txt` | Hosting permanen gratis (Neon + Render + Vercel) |
+| `panduan/07_AKUN_DEMO_dan_URL.txt` | Akun demo, URL penting, API key IoT, endpoint demo |
+| `panduan/08_STRUKTUR_Project.txt` | Struktur folder, teknologi, alur request, daftar fitur |
+| `panduan/09_CHEATSHEET_Perintah.txt` | Perintah cepat siap copy-paste |
 
 ## Future Development
 
-MQTT, Web Push, QR Code, predictive maintenance, multi-lab, mobile app.
+PDF laporan & surat peminjaman, email notifikasi, deteksi anomali sensor, MQTT, Web Push, predictive maintenance, multi-lab, mobile app.
 
 ---
 

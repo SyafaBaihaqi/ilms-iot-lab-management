@@ -1,0 +1,145 @@
+============================================================
+ 02 - MENJALANKAN ILMS SECARA ONLINE (PUBLISH KE INTERNET)
+============================================================
+ Membuat website ILMS bisa diakses dari internet / HP /
+ komputer lain, dengan HTTPS, TANPA buka port router.
+
+Alur jaringannya:
+   Internet (HTTPS)
+      -> Cloudflare
+      -> Cloudflare Tunnel (cloudflared)
+      -> http://127.0.0.1:4173   (frontend online server)
+      -> http://127.0.0.1:5000   (backend API)
+      -> PostgreSQL (localhost:5432, tidak terekspos internet)
+
+------------------------------------------------------------
+ CARA PALING CEPAT (1 klik) - REKOMENDASI
+------------------------------------------------------------
+ 1) Buka folder:  D:\Study\Prototype\ILMS
+ 2) Double-click:  mulai-online.bat
+ 3) Tunggu 10-20 detik.
+ 4) Buka:         https://ilms.saiasyap.my.id
+ 5) Login:        admin / admin123
+
+ Apa yang dilakukan mulai-online.bat?
+   [0/4] Membersihkan proses lama + port 5000 & 4173
+   [1/4] Menyalakan PostgreSQL via docker compose
+   [2/4] Membuka jendela "ILMS Backend"      -> :5000
+   [3/4] Build frontend bila perlu, lalu membuka
+         jendela "ILMS Online Server"          -> :4173
+   [4/4] Membuka jendela "Cloudflare Tunnel"  -> ke internet
+
+ PENTING: jangan tutup 3 jendela kecil itu selama online.
+  - Tutup Backend     -> semua API error
+  - Tutup Online Srv  -> website 502
+  - Tutup Tunnel      -> website tidak ditemukan / 1033
+
+------------------------------------------------------------
+ CARA MANUAL (kalau mau paham tiap proses)
+------------------------------------------------------------
+ Buka 4 CMD terpisah:
+
+ Terminal 1 - Database:
+     cd /d D:\Study\Prototype\ILMS
+     docker compose up -d
+
+ Terminal 2 - Backend API (:5000):
+     cd /d D:\Study\Prototype\ILMS\backend
+     npm.cmd run dev
+
+ Terminal 3 - Frontend Online (:4173):
+     cd /d D:\Study\Prototype\ILMS\frontend
+     npm.cmd run build        <- sekali saja, atau bila dist/ hilang
+     node serve-online.mjs
+
+ Terminal 4 - Cloudflare Tunnel:
+     cloudflared tunnel run ilms
+
+ Tanda berhasil:
+   Backend   : "ILMS Backend API running on http://localhost:5000"
+   Online    : "ILMS online server running on http://127.0.0.1:4173"
+   Tunnel    : "Registered tunnel connection connIndex=0 ..."
+
+------------------------------------------------------------
+ KENAPA HARUS PAKAI serve-online.mjs (bukan vite preview)?
+------------------------------------------------------------
+ Cloudflare tunnel memanggil 127.0.0.1 (IPv4).
+ Vite preview hanya bind ke ::1 (IPv6), sehingga tidak
+ terjangkau tunnel. serve-online.mjs sengaja bind ke
+ 127.0.0.1 IPv4 + meng-proxy /api ke backend :5000, jadi
+ satu port (4173) melayani frontend DAN API.
+
+------------------------------------------------------------
+ KONSEP PENTING: TUNNEL BUKAN HOSTING
+------------------------------------------------------------
+ Tunnel = "jendela ke internet" yang ikut mati kalau PC mati.
+   - PC reboot / logout / tidur  ->  website langsung 1033/502
+   - Tidak ada biaya, tapi tidak 24/7.
+ Untuk 24/7 sungguhan, pakai Render + Vercel + Neon:
+     -> lihat  06_DEPLOYMENT_Gratis_24-7.txt
+
+------------------------------------------------------------
+ CEK KESEHATAN (verifikasi cepat)
+------------------------------------------------------------
+   http://localhost:4173/api/health    -> harusnya
+        {"success":true,"status":"ok",...}
+
+   https://ilms.saiasyap.my.id          -> halaman login
+
+   Cek apakah backend hidup dari luar (lewat domain):
+        buka  https://ilms.saiasyap.my.id/api/health
+
+------------------------------------------------------------
+ MATIKAN / BERHENTI
+------------------------------------------------------------
+   Tutup 3 jendela (Backend, Online Server, Tunnel).
+   Stop database:
+       cd /d D:\Study\Prototype\ILMS
+       docker compose down
+
+------------------------------------------------------------
+ PERSIAPAN CLOUDFLARE (hanya sekali seumur hidup)
+------------------------------------------------------------
+ 1) Daftar akun gratis:  https://dash.cloudflare.com
+ 2) Tambahkan domain -> paket Free -> ubah nameserver
+    sesuai petunjuk Cloudflare -> tunggu status Active.
+ 3) Install cloudflared:
+        winget install --id Cloudflare.cloudflared -e
+    Lokasi di PC ini:
+        C:\Program Files (x86)\cloudflared\cloudflared.exe
+ 4) Login (sekali):
+        cloudflared tunnel login
+ 5) Buat tunnel + sambungkan DNS:
+        cloudflared tunnel create ilms
+        cloudflared tunnel route dns ilms ilms.saiasyap.my.id
+    Catat <id-tunnel> yang muncul.
+ 6) Isi file konfigurasi:
+        %USERPROFILE%\.cloudflared\config.yml
+    Contoh isi:
+        tunnel: ilms
+        credentials-file: C:\Users\asust\.cloudflared\<id-tunnel>.json
+        ingress:
+          - hostname: ilms.saiasyap.my.id
+            service: http://127.0.0.1:4173
+          - service: http_status:404
+
+ Template konfigurasi ada di:
+        deploy\cloudflared-config.template.yml
+
+------------------------------------------------------------
+ TIPS PRESENTASI / DEMO
+------------------------------------------------------------
+ 1) Nyalakan online 30-60 menit sebelum demo (tunnel butuh
+    handshake ke server Cloudflare).
+ 2) Ganti password admin & user lewat menu Profil SEBELUM
+    dipublikasikan.
+ 3) Cek dari HP memakai data seluler (bukan WiFi) untuk
+    memastikan benar-benar bisa diakses publik.
+ 4) Siapkan screenshot sebagai cadangan kalau tunnel
+    sempat terputus saat demo.
+ 5) Jangan tutup jendela CMD saat demo sedang dilakukan.
+
+============================================================
+ Lanjut: masalah?  ->  05_DEBUGGING_Troubleshooting.txt
+ Hosting 24/7?     ->  06_DEPLOYMENT_Gratis_24-7.txt
+============================================================

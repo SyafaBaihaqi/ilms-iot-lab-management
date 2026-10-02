@@ -1,0 +1,138 @@
+============================================================
+ 06 - DEPLOYMENT / HOSTING PERMANEN GRATIS (24/7)
+============================================================
+ Tunnel (file 02) MATI kalau PC mati. Untuk 24/7 sungguhan,
+ pakai trio gratis ini:
+
+   Neon    -> database PostgreSQL di cloud (gratis)
+   Render  -> backend API Node.js (gratis, auto-sleep)
+   Vercel  -> frontend React (gratis)
+   + GitHub Actions  -> ping Render tiap 10 menit supaya
+                        tidak sleep ( Render free tier sleep
+                        setelah 15 menit idle)
+
+ Panduan LENGKAP + screenshot + setting env vars ada di:
+        ..\docs\DEPLOYMENT.md
+ File ini hanya ringkasannya.
+
+------------------------------------------------------------
+ 1. NEON (DATABASE CLOUD)
+------------------------------------------------------------
+ 1) Daftar:  https://neon.tech  (gratis, tanpa kartu kredit)
+ 2) Buat project > pilih region > buat database.
+ 3) Salin connection string (berbentuk postgres://...).
+    GANTI password-nya (bukan yang default).
+ 4) Jalankan di lokal untuk push schema ke Neon:
+        cd /d D:\Study\Prototype\ILMS\backend
+        set DATABASE_URL=postgres://USER:PASSWORD@HOST/neondb?sslmode=require
+        npx prisma generate
+        npx prisma db push
+        npm run prisma:seed
+    (pakai "npm run prisma:seed", JANGAN "npx prisma db seed")
+ 5) Salin connection string ke Render (langkah 2).
+
+------------------------------------------------------------
+ 2. RENDER (BACKEND API)
+------------------------------------------------------------
+ 1) Daftar:  https://render.com  (gratis)
+ 2) New > Web Service > connect repo GitHub:
+        SyafaBaihaqi/ilms-iot-lab-management
+ 3) Setting PENTING:
+     Root Directory        : backend
+     Build Command         : npm ci && npx prisma generate && npm run build
+     Start Command         : node dist/app.js
+     Health Check Path     : /api/health
+     (nilai ini sudah otomatis ada di file render.yaml di repo)
+ 4) Environment Variables (WAJIB):
+     NODE_ENV              = production
+     DATABASE_URL          = <connection string Neon>
+     JWT_SECRET            = <string panjang random>
+     JWT_EXPIRES_IN        = 1d
+     REFRESH_SECRET        = <string panjang random>
+     REFRESH_EXPIRES_IN    = 7d
+     CORS_ORIGIN           = https://ilms-frontend.vercel.app
+       (atau domain frontend milik Anda)
+     FRONTEND_URL          = https://ilms-frontend.vercel.app
+       (dipakai untuk QR Code: alamat tujuan saat discan)
+     IOT_OFFLINE_THRESHOLD_MINUTES = 2
+ 5) Deploy. Gratis akan "sleep" setelah idle ~15 menit.
+    Bangunkan dengan ping (lihat file .github/workflows/keep-alive.yml).
+
+ CATATAN:
+  - Render paket Free punya 750 jam/bulan runtime.
+  - Health check WAJIB diisi supaya Render tidak langsung tidur.
+  - FRONTEND_URL belum ada di render.yaml, jadi harus
+    ditambahkan manual lewat dashboard Render (Environment).
+
+------------------------------------------------------------
+ 3. VERCEL (FRONTEND)
+------------------------------------------------------------
+ 1) Daftar:  https://vercel.com  (gratis, login pakai GitHub)
+ 2) New Project > import repo yang sama.
+ 3) Setting:
+     Framework Preset  : Vite
+     Root Directory    : frontend
+     Build Command     : npm run build
+     Output Directory  : dist
+ 4) Environment Variables:
+     VITE_API_BASE_URL = https://ilms-api.onrender.com/api
+ 5) Deploy.
+
+ CATATAN:
+  - File  frontend\vercel.json  sudah menyertakan rewrite
+    SPA (semua path -> /index.html) agar refresh halaman
+    dalam tidak 404.
+  - vercel.json juga sudah mengatur Cache-Control:
+    sw.js & index.html = no-cache (selalu versi terbaru),
+    assets/ = immutable 1 tahun (loading cepat).
+  - File  frontend\public\_redirects  dipakai kalau nanti
+    hosting-nya Netlify.
+
+------------------------------------------------------------
+ 4. KEEP-ALIVE (BIAR RENDER TIDAK TIDUR)
+------------------------------------------------------------
+ Repo sudah punya workflow:
+        .github\workflows\keep-alive.yml
+  - Dijalankan tiap 10 menit (cron).
+  - Memanggil URL Render pakai curl.
+  - Memerlukan SECRET di GitHub:
+        Settings > Secrets and variables > Actions
+        New repository secret:
+            name  : API_BASE_URL
+            value : https://ilms-api.onrender.com/api
+
+  CARA PASANG SECRET:
+     1) Buka repo di GitHub
+     2) Tab  Settings  >  Secrets and variables  >  Actions
+     3) Klik  New repository secret
+     4) Isi  API_BASE_URL  = URL backend Render + /api
+     5) Save
+
+ Efek: backend tidak akan sleep, respons cepat (<1 detik).
+
+------------------------------------------------------------
+ 5. DOMAIN CUSTOM (OPSIONAL)
+------------------------------------------------------------
+  Di Vercel: Settings > Domains > Add  ilms.saiasyap.my.id
+  Lalu di Cloudflare tambahkan record CNAME:
+      type    : CNAME
+      name    : ilms
+      target  : cname.vercel-dns.com
+  Lalu update CORS_ORIGIN & FRONTEND_URL di Render.
+
+------------------------------------------------------------
+ 6. CHECKLIST SEBELUM SUBMIT / PRESENTASI
+------------------------------------------------------------
+  [ ] Neon sudah di-push schema-nya (prisma db push + seed)
+  [ ] Render health check = /api/health  (status 200)
+  [ ] Render tidak sleep (keep-alive sudah dipasang)
+  [ ] Vercel VITE_API_BASE_URL sudah benar
+  [ ] CORS_ORIGIN di Render sesuai domain frontend
+  [ ] Login admin berhasil di domain produksi
+  [ ] Semua halaman bisa di-refresh (tidak 404)
+  [ ] Password demo sudah diganti (atau tidak untuk demo)
+  [ ] Tidak ada file .env / config.h di repo (git ls-files)
+
+============================================================
+ Lanjut: akun demo & URL -> 07_AKUN_DEMO_dan_URL.txt
+============================================================

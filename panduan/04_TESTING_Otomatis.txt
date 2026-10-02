@@ -1,0 +1,133 @@
+============================================================
+ 04 - TESTING OTOMATIS (VITEST + SUPERTEST)
+============================================================
+ Project punya 45 test otomatis yang memverifikasi backend
+ dari sisi API (tanpa membuka browser).
+
+ Framework : Vitest  +  Supertest
+ Lokasi    :  backend\tests\
+ Config    :  backend\vitest.config.mts
+ Database  :  backend\tests\ -> memakai database TERPISAH "ilms_test"
+
+ Kenapa database terpisah?
+  Supaya test TIDAK MENGHAPUS / MENGUBAH data demo (ilms_db).
+  Test otomatis menghapus data sebelum/ sesudah tiap file test
+  di database test saja.
+
+------------------------------------------------------------
+ 1. PERSIAPAN SEKALI SAJA
+------------------------------------------------------------
+ 1) Docker harus jalan (untuk database):
+        cd /d D:\Study\Prototype\ILMS
+        docker compose up -d
+
+ 2) Buat database test (hanya sekali):
+        docker exec ilms_postgres psql -U postgres -d postgres ^
+          -c "CREATE DATABASE ilms_test;"
+
+    (kalau sudah ada & mau pakai ulang, skip langkah ini)
+
+ 3) Pasang dependency test:
+        cd /d D:\Study\Prototype\ILMS\backend
+        npm install
+
+------------------------------------------------------------
+ 2. JALANKAN TEST
+------------------------------------------------------------
+     cd /d D:\Study\Prototype\ILMS\backend
+
+     npm test                -> jalankan sekali (semua test)
+     npm run test:watch      -> mode watch (otomatis rerun)
+
+ S shorthand yang sudah ada di package.json:
+     test          : vitest run
+     test:watch    : vitest
+     test:db:setup : prisma db push --skip-generate
+
+ Output sukses yang diharapkan:
+     Test Files  5 passed (5)
+     Tests      45 passed (45)
+
+ CATATAN PENTING:
+  Database test harus punya schema yang sudah di-push.
+  Kalau test gagal dengan "relation does not exist", jalankan:
+       $env:TEST_DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ilms_test?schema=public"
+       npx prisma db push --skip-generate
+       npm test
+  (di CMD cukup:  set TEST_DATABASE_URL=postgresql://... lalu ulangi)
+
+------------------------------------------------------------
+ 3. FILE TEST & APA YANG DIUJI
+------------------------------------------------------------
+ backend\tests\helpers.ts ........ fungsi bantu (reset data test,
+                                       bikin token JWT, dll)
+  auth.test.ts ............ (9 test)
+     - Login pakai username, NIM, email, HP
+     - Password salah ditolak (401)
+     - Token tidak valid ditolak (401)
+     - Me / profil, refresh token, logout
+  rbac.test.ts ............ (6 test)
+     - User biasa TIDAK bisa akses endpoint admin (403)
+     - Admin bisa akses
+     - Validasi ID/role
+  component.test.ts ....... (9 test)
+     - Buat / update / delete komponen (admin)
+     - Stok awal & penyesuaian (audit trail)
+     - Ambil riwayat stok
+     - QR Code PNG & SVG (signature file benar)
+     - 404 untuk komponen tidak ada
+  loan.test.ts ............ (9 test)
+     - Alur peminjaman lengkap:
+       create -> approve -> pinjam -> kembali -> approve return
+     - Stok berkurang & kembali dengan benar
+     - 422 saat stok tidak cukup
+     - User tidak bisa approve (403)
+     - Log audit ikut terisi
+  ticket.test.ts .......... (12 test)
+     Ticket .............. user buat tiket, admin balas
+     Tiket ............... hanya pembuat tiket yang bisa akses (403)
+     Tiket ............... perubahan status Open -> In_Progress ->
+                           Resolved (enum Prisma "In_Progress",
+                           bukan "In Progress" dengan spasi)
+     Tiket ............... tutup tiket
+
+  Totalnya 45 test, sudah semua lulus.
+
+------------------------------------------------------------
+ 4. MENJALANKAN SATU FILE TEST SAJA
+------------------------------------------------------------
+     npx vitest run tests/loan.test.ts
+
+     ATAU dengan pola nama:
+     npx vitest run tests/ticket
+
+------------------------------------------------------------
+ 5. KUSTOMISASI
+------------------------------------------------------------
+  File  backend\vitest.config.mts:
+     - Ganti TEST_DATABASE_URL  -> nama database test lain
+     - fileParallelism:false    -> test jalan berurutan (default)
+     - testTimeout:30000       -> batas waktu per test
+
+  Kalau test GAGAL karena sisa data dari run sebelumnya:
+     Test sudah otomatis Membersihkan database test
+     di beforeEach/afterEach. Kalau masih error,
+     reset manual:
+         docker exec ilms_postgres psql -U postgres -d ilms_test ^
+           -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+         npx prisma db push --skip-generate
+         npm test
+
+------------------------------------------------------------
+ 6. DAFTAR TEST YANG SUDAH DILULUSKAN (per 10/2026)
+============================================================
+     auth.test.ts ..... 9/9  PASS
+     rbac.test.ts ..... 6/6  PASS
+     component.test.ts  9/9  PASS
+     loan.test.ts ..... 9/9  PASS
+     ticket.test.ts ... 12/12 PASS
+     TOTAL ........... 45/45 PASS
+
+============================================================
+ Lanjut: ada test yang gagal? -> 05_DEBUGGING_Troubleshooting.txt
+============================================================

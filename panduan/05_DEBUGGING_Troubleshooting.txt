@@ -1,0 +1,262 @@
+============================================================
+ 05 - DEBUGGING & TROUBLESHOOTING
+============================================================
+ Kumpulan SEMUA error yang mungkin terjadi + solusinya.
+ Cari cepat berdasarkan kata kunci error di file ini.
+
+============================================================
+ BAGIAN 1 - MASALAH POWER-SHELL / CMD
+============================================================
+
+[1.1] npm.ps1 tidak dapat dimuat / "running scripts is disabled"
+  Gejala:
+     npm : File C:\...\npm.ps1 tidak dapat dimuat karena
+     eksekusi skrip dinonaktifkan pada sistem ini.
+  Penyebab: PowerShell memblokir file .ps1 (ExecutionPolicy).
+  Solusi 1 (paling gampang - pakai .cmd):
+     npm.cmd run dev
+     bukan:  npm run dev
+  Solusi 2 (permanen, buka CMD saja):
+     Jangan pakai PowerShell, pakai Command Prompt (CMD).
+  Solusi 3 (ubah policy, kalau mau):
+     Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+     lalu tutup & buka PowerShell lagi.
+
+[1.2] "npx" tidak ditemukan
+  Solusi:  npm.cmd install -g npx    (jarang perlu)
+
+[1.3] Path folder mengandung spasi
+  Selalu kutip path:
+     cd /d "D:\Study\Prototype\ILMS\backend"
+
+============================================================
+ BAGIAN 2 - MASALAH PORT (paling sering!)
+============================================================
+
+[2.1] "Port 5000 is already in use"
+  Arti: ada proses backend ILMS lama yang masih jalan.
+  Solusi CMD:
+     netstat -ano | findstr :5000
+     taskkill /PID <PID> /F
+  Solusi PowerShell:
+     Get-NetTCPConnection -LocalPort 5000 -State Listen |
+       ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+  CEPAT:  jalankan mulai-online.bat (otomatis bersih-kan).
+
+[2.2] "Port 4173 is already in use"
+  Sama seperti [2.1], ganti 5000 jadi 4173.
+ Penyebab: biasanya serve-online.mjs yang masih jalan.
+
+[2.3] "Port 5173 is already in use"
+  Vite otomatis pindah port (5174, dst). Tidak fatal.
+  Atau paksa pakai port lain:
+     npm.cmd run dev -- --port 3000
+
+[2.4] Cara cek siapa yang pakai port (CMD):
+     netstat -ano | findstr :PORT
+  Lihat kolom paling kanan = PID. taskkill /PID xxx /F
+
+============================================================
+ BAGIAN 3 - MASALAH DATABASE
+============================================================
+
+[3.1] Prisma: "Can't reach database server at localhost:5432"
+  Penyebab: Docker belum jalan.
+  Solusi:
+     buka Docker Desktop, tunggu "Engine running"
+     cd /d D:\Study\Prototype\ILMS
+     docker compose up -d
+     docker ps          <- pastikan ilms_postgres "Up"
+
+[3.2] "database ilms_db does not exist"
+  Solusi:
+     cd /d D:\Study\Prototype\ILMS
+     docker compose up -d
+     cd backend
+     npx prisma db push
+     npm run prisma:seed
+
+[3.3] Tabel/kolom tidak ditemukan ("relation does not exist")
+  Penyebab: schema.prisma diubah tapi DB belum di-push.
+  Solusi:
+     cd backend
+     npx prisma db push
+     npx prisma generate     <- WAJIB juga untuk TypeScript
+
+[3.4] Error Prisma generate "EPERM" / "file is being used"
+  Penyebab: backend sedang jalan (dev server Holding file
+            .prisma/client di memory).
+  Solusi:
+     1) Ctrl+C di terminal backend (hentikan server)
+     2) npx prisma generate
+     3) npm.cmd run dev     (jalan lagi)
+
+[3.5] Test otomatis gagal "relation does not exist"
+  Penyebab: database ilms_test belum di-push.
+  Solusi (CMD):
+     set TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ilms_test?schema=public
+     npx prisma db push --skip-generate
+     npm test
+
+[3.6] Ingin lihat data langsung
+  Lihat 03_DATABASE_Prisma.txt bagian 4 (psql / Prisma Studio).
+
+============================================================
+ BAGIAN 4 - MASALAH BACKEND / API
+============================================================
+
+[4.1] Backend tidak mau start / langsung crash
+  1) Lihat pesan error di terminal (scroll ke atas).
+  2) Pastikan .env ada & DATABASE_URL benar:
+       cd backend
+       dir .env
+  3) npm.cmd install    <- kalau "Cannot find module"
+  4) npx prisma generate
+
+[4.2] 401 Unauthorized
+  Arti: token tidak dikirim / kadaluarsa / tidak valid.
+  Solusi: logout & login ulang di browser.
+
+[4.3] 403 Forbidden
+  Arti: sudah login, tapi role tidak boleh.
+  Solusi: login pakai akun admin (admin/admin123).
+
+[4.4] 404 Not Found
+  Arti: endpoint salah / data tidak ada.
+  Cek daftar endpoint:  docs\API.md
+
+[4.5] 422 Unprocessable (kirim data)
+  Arti: field tidak valid (mis. stok kurang, nilai di luar
+        range, enum salah). Body response berisi detailnya.
+  Solusi: baca pesan error di response Network tab browser.
+
+[4.6] 500 Internal Server Error
+  Arti: bug di server. Lihat stack trace di terminal backend.
+  Cek juga: database hidup? (lihat 3.1)
+
+[4.7] CORS error di console browser
+  Penyebab: frontend origin tidak ada di CORS_ORIGIN.
+  Solusi: cek  backend\.env  ->  CORS_ORIGIN
+  Untuk online: tambahkan  https://ilms.saiasyap.my.id
+
+============================================================
+ BAGIAN 5 - MASALAH FRONTEND
+============================================================
+
+[5.1] Halaman putih / kosong
+  1) Hard refresh:  Ctrl + Shift + R
+  2) Buka Console browser (F12), lihat error merah.
+  3) Pastikan backend masih jalan (port 5000).
+
+[5.2] "Cannot GET /api/..."
+  Penyebab: backend mati, atau frontend tidak proxy.
+  Solusi: pastikan backend jalan; cek  vite.config.ts
+          (proxy '/api' -> http://localhost:5000).
+
+[5.3] Halaman tidak bisa di-refresh (404 saat refresh)
+  Penyebab: buka langsung  http://localhost:5173/inventory
+  Solusi: selalu buka dari  http://localhost:5173  (root) dulu.
+  Untuk versi online (4173) sudah ada fallback SPA.
+
+[5.4] Login tidak berhasil padahal password benar
+  1) Coba hard refresh dulu.
+  2) Buka F12 -> Application -> Clear Site Data.
+  3) Pastikan backend jalan.
+
+[5.5] Tombol "Logout" tidak kembali ke halaman login
+  Refresh browser (Ctrl+Shift+R).
+
+[5.6] Icon/logo tidak muncul
+  Bersihkan cache PWA: F12 -> Application -> Service Workers
+  -> Unregister, lalu refresh.
+
+============================================================
+ BAGIAN 6 - MASALAH ONLINE / TUNNEL
+============================================================
+
+[6.1] Website 502 Bad Gateway
+  Arti: tunnel hidup, tapi tidak ada yang melayani 127.0.0.1:4173.
+  Penyebab: Online Server (:4173) mati ATAU Backend (:5000) mati.
+  Solusi: nyalakan ulang Online Server:
+       cd /d D:\Study\Prototype\ILMS\frontend
+       node serve-online.mjs
+  Tunnel tidak perlu direstart.
+
+[6.2] Website 1033 / "cloudflared tunnel error"
+  Arti: tunnel tidak aktif / koneksi putus.
+  Solusi: jalankan ulang  cloudflared tunnel run ilms
+
+[6.3] "cloudflared is not recognized"
+  Solusi: pakai path lengkap:
+       "C:\Program Files (x86)\cloudflared\cloudflared.exe" tunnel run ilms
+  atau install ulang:
+       winget install --id Cloudflare.cloudflared -e
+
+[6.4] Tunnel tidak bisa dibuat (error "tunnel already exists")
+  Sudah pernah dibuat. Cukup jalankan:
+       cloudflared tunnel run ilms
+
+[6.5] DNS error saat run (hostname tidak ter-map)
+  Solusi:
+       cloudflared tunnel route dns ilms ilms.saiasyap.my.id
+
+[6.6] Setelah build frontend, tampilan masih versi lama
+  Penyebab: browser masih pakai cache PWA.
+  Solusi: Ctrl+Shift+R, atau build ulang:
+       cd frontend
+       npm.cmd run build
+       (lalu restart serve-online.mjs)
+
+[6.7] APII key ESP32 error saat kirim sensor
+  Pastikan header  X-API-Key  sesuai device.apiKey di database.
+
+============================================================
+ BAGIAN 7 - MASALAH GITHUB / GIT
+============================================================
+
+[7.1] Push ditolak (non-fast-forward / ditolak remote)
+  Solusi:
+       git pull --rebase origin main
+       git push origin main
+
+[7.2] "Please make sure you have the correct access rights"
+  Solusi: login ulang:
+       gh auth login
+  atau pakai Personal Access Token (HTTPS).
+
+[7.3] Tidak sengaja commit file rahasia (.env, config.h)
+  .gitignore sudah menutup keduanya. Kalau terlanjur
+  ter-commit:
+       git rm --cached backend/.env
+       git commit -m "remove secret"
+       git push
+  (pada repo publik, SEGERA ganti passwordnya!)
+
+============================================================
+ BAGIAN 8 - CARA DEBUG CEPAT (flowchart)
+============================================================
+
+  Website tidak bisa diakses?
+    |
+    +-- cek  http://localhost:4173/api/health
+    |     |
+    |     +-- 200  -> tunnel saja yang masalah  ->  [6.2]
+    |     +-- gagal -> Online Server / Backend mati ->  [2.x]
+    |
+    +-- cek  http://localhost:5000/api/health
+          |
+          +-- 200  -> backend sehat, masalah di frontend
+          +-- gagal -> backend mati / crash  ->  [4.1]
+
+  API error 401/403?
+    ->  cek [4.2] / [4.3]
+
+  Halaman error "relation does not exist"?
+    ->  cek [3.3]
+
+  Test otomatis gagal?
+    ->  cek 04_TESTING_Otomatis.txt bagian 5
+
+============================================================
+ Lanjut: hosting permanen 24/7? -> 06_DEPLOYMENT_Gratis_24-7.txt
+============================================================

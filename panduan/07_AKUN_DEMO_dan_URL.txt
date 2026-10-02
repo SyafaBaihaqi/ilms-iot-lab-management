@@ -1,0 +1,114 @@
+============================================================
+ 07 - AKUN DEMO, URL PENTING, & API KEY
+============================================================
+ Semua yang perlu Anda ingat/hafal saat demo.
+
+------------------------------------------------------------
+ 1. AKUN DEMO
+------------------------------------------------------------
+ +-----------+--------------+------------+-------------------------+
+ | Peran     | Username     | Password   | Hak akses                |
+ +-----------+--------------+------------+-------------------------+
+ | Admin     | admin        | admin123   | SEMUA fitur              |
+ | User      | mahasiswa1   | user123    | Peminjaman, Tiket, Profil|
+ | User      | user         | user123    | Peminjaman, Tiket, Profil|
+ +-----------+--------------+------------+-------------------------+
+
+ Login juga bisa pakai identifier lain (NIM/NIDN, email, HP)
+ yang terdaftar di akun tersebut. Contoh akun yang terdaftar:
+     mahasiswa1  -> NIM 2022101, 081298765432, mahasiswa1@ilms.lab
+     admin       -> 081234567890, admin@ilms.lab
+     Jaspaker    -> 088226741788, ewesayap33@gmail.com   (Admin)
+     saiasyap    -> ilms@gmail.com                      (User)
+
+ TIPS:
+  - Admin = akun demo. Jangan lupa ganti passwordnya (atau
+    biarkan untuk demo) lewat menu  Profil.
+  - Role 'User' (mahasiswa1/user) TIDAK bisa buka Log Audit
+    maupun menu Pengguna. Endpoint /api/audit-logs hanya
+    untuk Admin.
+  - QR Code inventori boleh diakses semua user yang login
+    (endpoint /api/components/:id/qrcode tidak perlu admin).
+
+------------------------------------------------------------
+ 2. URL PENTING (localhost)
+------------------------------------------------------------
+  Frontend dev (Vite hot-reload) ....... http://localhost:5173
+  Frontend online (build statis) ....... http://localhost:4173
+  Backend API .......................... http://localhost:5000
+  Health check backend ................. http://localhost:5000/api/health
+  Health check via frontend proxy ...... http://localhost:4173/api/health
+  Prisma Studio (lihat DB) ............. http://localhost:5555
+
+------------------------------------------------------------
+ 3. URL PUBLIK (ONLINE)
+------------------------------------------------------------
+  Website  ............................. https://ilms.saiasyap.my.id
+  API (via tunnel, transparan ke 5000).. https://ilms.saiasyap.my.id/api
+
+------------------------------------------------------------
+ 4. API KEY IOT (ESP32)
+------------------------------------------------------------
+  Device demo bawaan:
+      Device ID : ESP32-LAB-001
+      API Key   : ilms_esp32_dev_secret_key_123
+  Header yang dipakai saat kirim data:
+      X-API-Key: ilms_esp32_dev_secret_key_123
+
+  Simulasi kirim heartbeat (tanpa hardware, CMD/PowerShell):
+      curl -X POST http://localhost:5000/api/devices/heartbeat ^
+           -H "X-API-Key: ilms_esp32_dev_secret_key_123" ^
+           -H "Content-Type: application/json" ^
+           -d "{\"timestamp\": 123456}"
+
+  Simulasi kirim data sensor:
+      curl -X POST http://localhost:5000/api/sensors/readings/batch ^
+           -H "X-API-Key: ilms_esp32_dev_secret_key_123" ^
+           -H "Content-Type: application/json" ^
+           -d "{\"readings\":[{\"sensorType\":\"temperature\",\"value\":29.4,\"unit\":\"C\"},{\"sensorType\":\"humidity\",\"value\":68.2,\"unit\":\"%\"},{\"sensorType\":\"distance\",\"value\":15.0,\"unit\":\"cm\"}]}"
+
+  Lalu buka menu  Monitoring Sensor  untuk melihat grafiknya.
+
+  PENTING: API key demo ini ada di repo publik-ish. Untuk
+  produksi, WAJIB ganti (menu Perangkat IoT > Edit > API Key).
+
+------------------------------------------------------------
+ 5. ENDPOINT YANG SERING DEMO-DITUNJUKKAN
+------------------------------------------------------------
+  GET  /api/health                        -> status server
+  POST /api/auth/login                    -> login
+  GET  /api/dashboard/summary             -> ringkasan dashboard
+  GET  /api/components                    -> daftar inventori
+  GET  /api/components/:id/qrcode         -> unduh QR (PNG)
+  POST /api/loans                         -> buat peminjaman
+  PUT  /api/loans/:id/approve             -> setujui (ADMIN)
+  PUT  /api/loans/:id/reject              -> tolak (ADMIN)
+  PUT  /api/loans/:id/return              -> proses pengembalian (ADMIN)
+  PUT  /api/loans/:id/cancel              -> batalkan
+  GET  /api/sensors/readings              -> data sensor
+  GET  /api/reports/inventory             -> laporan JSON
+  GET  /api/reports/inventory?format=csv  -> unduh CSV
+  GET  /api/audit-logs                    -> log audit (ADMIN ONLY)
+  GET  /api/audit-logs/facets             -> pilihan filter audit
+  GET  /api/tickets                       -> tiket CS
+  GET  /api/tickets/stats                 -> statistik tiket
+  POST /api/tickets                       -> buat tiket
+  POST /api/tickets/:id/replies           -> balas tiket
+  PUT  /api/tickets/:id                   -> ubah status (admin)
+  PUT  /api/tickets/:id/close             -> tutup tiket
+
+  Daftar lengkap + contoh request/response:  docs\API.md
+
+------------------------------------------------------------
+ 6. AKUN GIT / REPO
+------------------------------------------------------------
+  Repo        : https://github.com/SyafaBaihaqi/ilms-iot-lab-management
+  User        : SyafaBaihaqi
+  Visibility  : PRIVATE
+  Branch      : main
+  Repo dibuat : 2 Oktober 2026
+  Commits     : 5362302 (awal)  +  5089da7 (fitur)
+
+============================================================
+ Lanjut: struktur project -> 08_STRUKTUR_Project.txt
+============================================================

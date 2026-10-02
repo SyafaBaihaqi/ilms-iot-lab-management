@@ -1,0 +1,72 @@
+============================================================
+ PANDUAN LENGKAP ILMS - DAFTAR ISI
+ IoT Lab Management System
+============================================================
+ Folder ini berisi SEMUA dokumentasi cara menjalankan,
+ mendiagnosis, dan mengelola project ILMS dengan rapi.
+ Setiap file dipisah berdasarkan kategori agar mudah dicari.
+
+------------------------------------------------------------
+ DAFTAR FILE
+------------------------------------------------------------
+ 00_DAFTAR_ISI.txt .................... (file ini) daftar isi
+
+ 01_MENJALANKAN_Lokal.txt ............ Menjalankan di PC sendiri
+                                        (Docker + backend :5000 +
+                                        frontend :5173)
+ 02_MENJALANKAN_Online.txt ............ Menjalankan versi online
+                                        (1 klik / tunnel /
+                                        domain publik)
+ 03_DATABASE_Prisma.txt .............. Setting up database, seed
+                                        data demo, reset total
+ 04_TESTING_Otomatis.txt .............. Menjalankan 45 test
+                                        otomatis (login, RBAC,
+                                        peminjaman, QR, audit)
+ 05_DEBUGGING_Troubleshooting.txt ..... Semua error & solusinya
+                                        (WAJIB baca kalau ada
+                                        masalah)
+ 06_DEPLOYMENT_Gratis_24-7.txt ........ Hosting permanen gratis
+                                        (Neon + Render + Vercel +
+                                        keep-alive)
+ 07_AKUN_DEMO_dan_URL.txt ............ Akun demo, URL penting,
+                                        API key IoT, cheat URL
+ 08_STRUKTUR_Project.txt .............. Struktur folder & teknologi
+ 09_CHEATSHEET_Perintah.txt ........... Kumpulan perintah cepat
+                                        (copy-paste)
+
+------------------------------------------------------------
+ DOKUMENTASI LAIN (di luar folder ini)
+------------------------------------------------------------
+ Semua path di dalam file panduan ini ditulis RELATIF terhadap
+ folder utama project (ILMS), yaitu satu folder di atas
+ folder panduan. Contoh: "backend\src\app.ts" berarti
+ D:\Study\Prototype\ILMS\backend\src\app.ts
+
+ README.md ......................... Dokumentasi utama project
+ ..\docs\API.md .................... Daftar lengkap semua endpoint
+ ..\docs\DEPLOYMENT.md ............. Panduan hosting permanen
+ ..\ILMS_Blueprint.md .............. Blueprint / rancangan sistem
+ ..\60225058_..._ILMS Blueprint.md . Dokumen rancangan awal
+ ..\database\schema.sql ............ SQL dump struktur tabel
+ ..\deploy\ ......................... Konfigurasi cloudflared
+
+------------------------------------------------------------
+ ATURAN EMAS (baca dulu)
+------------------------------------------------------------
+ 1. Selalu jalankan dari CMD, bukan PowerShell.
+    (PowerShell sering menolak "npm" - lihat file 05)
+ 2. Untuk PowerShell, pakai "npm.cmd" (bukan "npm").
+ 3. Jangan pernah commit file .env atau iot\esp32\config.h
+    (sudah otomatis di-ignore oleh .gitignore).
+ 4. Sebelum demo/presentasi, ALWAYS jalankan file 02 supaya
+    online & siap dipamerkan.
+
+------------------------------------------------------------
+ RINGKASAN CEPAT (kalau males baca semua)
+------------------------------------------------------------
+  Online 1-klik  : double-click  ILMS\mulai-online.bat
+  Lokal biasa    : lihat  01_MENJALANKAN_Lokal.txt
+  Ada masalah    : lihat  05_DEBUGGING_Troubleshooting.txt
+  Reset database : lihat  03_DATABASE_Prisma.txt (bagian 6)
+
+============================================================

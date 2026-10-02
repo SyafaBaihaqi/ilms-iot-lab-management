@@ -1,0 +1,151 @@
+============================================================
+ 01 - MENJALANKAN PROJECT ILMS SECARA LOKAL
+============================================================
+ Menjalankan di PC sendiri tanpa internet.
+ Cocok untuk: ngoding, cek fitur, presentasi di kelas.
+
+ Struktur yang dijalankan:
+   1. PostgreSQL (Docker) ......... port 5432
+   2. Backend API (Node/Express)   port 5000
+   3. Frontend (React + Vite)      port 5173
+
+------------------------------------------------------------
+ SYARAT (install sekali saja)
+------------------------------------------------------------
+ - Node.js 18 atau 20
+   cek: node -v
+ - Docker Desktop  (HARUS sudah dibuka & "Engine running")
+ - Git  (opsional, hanya kalau mau sync ke GitHub)
+
+------------------------------------------------------------
+ LANGKAH 1 - NYALAKAN DATABASE (Docker)
+------------------------------------------------------------
+ Buka CMD (bukan PowerShell), lalu:
+
+     cd /d D:\Study\Prototype\ILMS
+     docker compose up -d
+
+ Container yang jalan namanya:  ilms_postgres
+ Cek:
+     docker ps
+ harus muncul ilms_postgres dengan status "Up".
+
+ Kredensial database (sudah otomatis di docker-compose.yml):
+     host     : localhost
+     port     : 5432
+     user     : postgres
+     password : postgres
+     database : ilms_db
+
+------------------------------------------------------------
+ LANGKAH 2 - BUAT TABEL & ISI DATA DEMO (sekali saja)
+------------------------------------------------------------
+     cd /d D:\Study\Prototype\ILMS\backend
+     npm install
+     npx prisma generate
+     npx prisma db push
+     npm run prisma:seed
+
+ Kalau tabel sudah ada, tidak perlu ulangi. Cek cepat:
+     npx prisma db push     ->  "Your database is in sync"
+
+------------------------------------------------------------
+ LANGKAH 3 - JALANKAN BACKEND  (Terminal 1, JANGAN TUTUP)
+------------------------------------------------------------
+     cd /d D:\Study\Prototype\ILMS\backend
+     npm run dev
+
+ Tunggu sampai muncul:
+     ILMS Backend API running on http://localhost:5000
+     Health check: http://localhost:5000/api/health
+
+ Backend juga otomatis menjalankan 3 scheduled job:
+   - sensor retention  (hapus data sensor lama)
+   - device heartbeat  (tandai device offline)
+   - loan reminder    (pengingat peminjaman)
+ Info lognya akan muncul di terminal yang sama.
+
+------------------------------------------------------------
+ LANGKAH 4 - JALANKAN FRONTEND  (Terminal 2, JANGAN TUTUP)
+------------------------------------------------------------
+     cd /d D:\Study\Prototype\ILMS\frontend
+     npm install
+     npm run dev
+
+ Vite akan printing:
+     Local:   http://localhost:5173/
+
+ Frontend otomatis proxy /api ke backend :5000
+ (lihat proxy di frontend\vite.config.ts), jadi tidak perlu
+ setting IP frontend.
+
+------------------------------------------------------------
+ LANGKAH 5 - BUKA & LOGIN
+------------------------------------------------------------
+ Buka browser:
+     http://localhost:5173
+
+ Login pakai akun demo:
+     Admin     ->  admin        / admin123
+     Mahasiswa ->  mahasiswa1   / user123
+     User      ->  user         / user123
+
+------------------------------------------------------------
+ STRUKTUR MENU (sidebar kiri, icon-only)
+------------------------------------------------------------
+   Dashboard
+   Inventori
+   Kategori
+   Peminjaman
+   Perangkat IoT
+   Monitoring Sensor
+   Laporan
+   Log Audit          (khusus Admin)
+   Pengguna           (khusus Admin)
+   Customer Service   (semua user)
+   Profil
+
+ Catatan: sidebar default-nya collapsed (icon saja).
+ Klik tombol ">>" di bagian bawah sidebar untuk membuka
+ labelnya.
+
+------------------------------------------------------------
+ MENGHENTIKAN
+------------------------------------------------------------
+   Ctrl+C di terminal backend
+   Ctrl+C di terminal frontend
+   docker compose down            (matikan DB, data aman)
+   docker compose down -v         (matikan DB + HAPUS data)
+
+------------------------------------------------------------
+ VARIASI: FRONTEND VERSI BUILD (mirip produksi)
+------------------------------------------------------------
+ Kalau mau frontend yang sama persis seperti versi online
+ (tanpa hot-reload, lebih ringan):
+
+     cd /d D:\Study\Prototype\ILMS\frontend
+     npm run build
+     node serve-online.mjs
+
+ Lalu buka  http://localhost:4173
+ (serve-online.mjs juga meng-proxy /api ke :5000)
+
+------------------------------------------------------------
+ VARIASI: BUKAN DI PC INI (deploy ke server / komputer lain)
+------------------------------------------------------------
+ 1. Install Node.js 18/20 dan Docker Desktop di PC tujuan.
+ 2. Copy folder ILMS (boleh tanpa node_modules & dist).
+ 3. Jalankan langkah 1-5 di atas.
+ 4. Pastikan backend/.env ada (copy dari backend/.env.example).
+
+------------------------------------------------------------
+ TROUBLESHOOTING CEPAT
+------------------------------------------------------------
+  Port 5000 dipakai?      ->  lihat 05_DEBUGGING (bagian 1)
+  "Cannot reach database" ->  Docker belum jalan / belum Up
+  Halaman putih kosong    ->  hard refresh  Ctrl+Shift+R
+  npm.ps1 diblokir        ->  pakai  npm.cmd  (lihat 05)
+
+============================================================
+ Lanjut: online/public?  ->  02_MENJALANKAN_Online.txt
+============================================================

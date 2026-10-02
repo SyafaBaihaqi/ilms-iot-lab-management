@@ -1,0 +1,180 @@
+============================================================
+ 09 - CHEATSHEET PERINTAH (COPY-PASTE)
+============================================================
+ Semua perintah yang sering dipakai, siap salin-tempel.
+ Jalankan dari CMD, atau pakai "npm.cmd" bila di PowerShell.
+
+------------------------------------------------------------
+ 1. PALING SERING DIPAKAI (hafal ini aja)
+------------------------------------------------------------
+  Mulai online 1-klik:
+     mulai-online.bat
+
+  Backend:
+     cd /d D:\Study\Prototype\ILMS\backend
+     npm.cmd run dev
+
+  Frontend:
+     cd /d D:\Study\Prototype\ILMS\frontend
+     npm.cmd run dev
+
+  Database:
+     cd /d D:\Study\Prototype\ILMS
+     docker compose up -d
+
+------------------------------------------------------------
+ 2. DATABASE
+------------------------------------------------------------
+  Nyalakan / cek / matikan:
+     docker compose up -d
+     docker ps
+     docker compose down
+     docker compose down -v              <- hapus data juga
+
+  Buat tabel dari schema:
+     cd backend
+     npx prisma db push
+
+  Generate ulang Prisma Client:
+     npx prisma generate
+
+  Isi data demo:
+     npm run prisma:seed
+
+  Buka GUI database:
+     npx prisma studio
+
+  Masuk psql:
+     docker exec -it ilms_postgres psql -U postgres -d ilms_db
+
+  Reset total:
+     npx prisma db push --force-reset
+     npm run prisma:seed
+
+  Cek status container (kalau error):
+     docker logs ilms_postgres --tail 30
+
+------------------------------------------------------------
+ 3. TEST OTOMATIS
+------------------------------------------------------------
+  Jalankan semua test:
+     cd backend
+     npm test
+
+  Mode watch:
+     npm run test:watch
+
+  Satu file test:
+     npx vitest run tests/loan.test.ts
+
+  Output lebih detail:
+     npx vitest run --reporter=verbose
+
+  (CATATAN: reporter "basic" tidak ada di Vitest 4. Pakai
+   --reporter=dot atau --reporter=verbose)
+
+------------------------------------------------------------
+ 4. FRONTEND
+------------------------------------------------------------
+  Jalankan dev server:
+     npm run dev
+
+  Build produksi:
+     npm run build
+
+  Jalankan hasil build:
+     node serve-online.mjs            (:4173)
+
+  Bersihkan cache build:
+     rd /s /q dist
+     rd /s /q node_modules\.vite
+     npm run build
+
+  Cek error TypeScript saja:
+     npx tsc -b
+
+------------------------------------------------------------
+ 5. BACKEND
+------------------------------------------------------------
+  Dev (auto-reload):
+     npm run dev
+
+  Build ke folder dist:
+     npm run build
+
+  Jalankan hasil build:
+     npm start
+
+  Cek error TypeScript saja:
+     npx tsc --noEmit
+
+  Lihat semua route aktif:
+     Cari "router.get" di backend\src\routes\
+
+------------------------------------------------------------
+ 6. ONLINE / TUNNEL
+------------------------------------------------------------
+ Start (1-klik):
+     mulai-online.bat
+
+  Manual - 4 terminal:
+     docker compose up -d
+     cd backend && npm.cmd run dev
+     cd frontend && node serve-online.mjs
+     cloudflared tunnel run ilms
+
+  Cek tunnel:
+     cloudflared tunnel info ilms
+     cloudflared tunnel list
+
+  Lihat log tunnel:
+     Lihat file tunnel-err.log (kalau dijalankan manual)
+
+------------------------------------------------------------
+ 7. MEMBERSIHKAN MASALAH
+------------------------------------------------------------  Hapus proses yang listen di port:
+     for /f "tokens=5" %a in ('netstat -ano ^| findstr :5000') do taskkill /PID %a /F
+     for /f "tokens=5" %a in ('netstat -ano ^| findstr :4173') do taskkill /PID %a /F
+
+  PowerShell (lebih gampang):
+     Get-NetTCPConnection -LocalPort 5000,4173 -State Listen ^
+       | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+
+  Hapus semua proses ILMS:
+     Get-CimInstance Win32_Process -Filter "Name='node.exe'" ^
+       | Where-Object { $_.CommandLine -like '*ILMS*' } ^
+       | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+
+  Bersihkan cache PWA di browser:
+     F12 -> Application -> Service Workers -> Unregister
+
+------------------------------------------------------------
+ 8. GIT
+------------------------------------------------------------  Lihat status:
+     git status
+
+  Simpan perubahan:
+     git add -A
+     git commit -m "pesan singkat"
+     git push origin main
+
+  Lihat riwayat:
+     git log --oneline -10
+
+  Buang perubahan yang tidak jadi disimpan:
+     git checkout -- .
+
+  Cek file rahasia yang terlanjur ter-add:
+     git diff --cached --name-only
+
+------------------------------------------------------------
+ 9. PINTASAN URL
+------------------------------------------------------------  Health backend ....... http://localhost:5000/api/health
+  Frontend dev .......... http://localhost:5173
+  Frontend online ....... http://localhost:4173
+  Website publik ........ https://ilms.saiasyap.my.id
+  Prisma Studio ........ http://localhost:5555
+
+============================================================
+ Dokumentasi lengkap ada di:  README.md  dan  docs\
+============================================================

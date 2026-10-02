@@ -1,0 +1,149 @@
+============================================================
+ 03 - DATABASE & PRISMA (PENGATURAN DATA)
+============================================================
+ Semua tentang database ILMS: koneksi, membuat tabel, seed,
+ reset, dan melihat data langsung.
+
+------------------------------------------------------------
+ 1. KONEKSI DATABASE
+------------------------------------------------------------
+ Sumber kebenaran:  backend\.env  ->  baris DATABASE_URL
+
+ Nilai default (lokal, lewat docker-compose.yml):
+     postgresql://postgres:postgres@localhost:5432/ilms_db?schema=public
+
+ Arti bagian URL:
+     postgresql://  = tipe database
+     postgres:postgres = user:password
+     localhost:5432 = host:port
+     ilms_db = nama database
+     ?schema=public = pakai schema public
+
+ Database untuk TESTING (dipisah dari data demo):
+     postgresql://postgres:postgres@localhost:5432/ilms_test?schema=public
+
+------------------------------------------------------------
+ 2. BUAT TABEL DARI SCHEMA (SECARA UMUM)
+------------------------------------------------------------
+     cd /d D:\Study\Prototype\ILMS\backend
+     npx prisma db push
+
+ Prisma akan membaca  backend\prisma\schema.prisma
+ lalu membuat/menyesuaikan tabel, index, dan relasi database.
+
+ CATATAN PENTING:
+  Project ini SENGAJA tidak memakai "prisma migrate".
+  Alasannya supaya mudah di-render/hosting tanpa file
+  migrasi. Selalu pakai "prisma db push".
+
+ Bin shorthand yang sudah tersedia di package.json:
+     npm run prisma:push          -> sama dengan npx prisma db push
+     npm run prisma:generate      -> regenerate Prisma Client
+     npm run prisma:seed          -> isi data demo
+
+------------------------------------------------------------
+ 3. ISI DATA DEMO (SEED)
+------------------------------------------------------------
+     cd /d D:\Study\Prototype\ILMS\backend
+     npm run prisma:seed
+
+ Apa yang dibuat seed (lihat prisma\seed.ts):
+   - Roles      : Admin, User
+   - Users      : admin/admin123, mahasiswa1/user123, user/user123
+   - 9 kategori barang
+   - 72 komponen  (5 demo + 67 komponen laboratorium)
+   - 1 device IoT demo + API key-nya
+
+ Seed aman dijalankan berkali-kali (idempotent).
+
+------------------------------------------------------------
+ 4. LIHAT DATA LANGSUNG (TANPA PAKE FRONTEND)
+------------------------------------------------------------
+ Cara A - psql di dalam Docker:
+     docker exec -it ilms_postgres psql -U postgres -d ilms_db
+
+   Setelah masuk psql:
+     \dt                    -- daftar tabel
+     \d components           -- struktur tabel components
+     SELECT * FROM components LIMIT 5;
+     SELECT status, COUNT(*) FROM loans GROUP BY status;
+     SELECT entity_type, COUNT(*) FROM audit_logs GROUP BY entity_type;
+     \q                      -- keluar
+
+ Cara B - Prisma Studio (GUI di browser, paling enak):
+     cd /d D:\Study\Prototype\ILMS\backend
+     npx prisma studio
+   Buka:  http://localhost:5555
+
+------------------------------------------------------------
+ 5. TABEL-TABEL PENTING (SCHEMA SINGKAT)
+------------------------------------------------------------
+ roles                 : daftar peran (Admin/User)
+ users                 : akun + NIM/NIDN, relasi ke role
+ categories            : kategori barang
+ components            : barang/inventori lab (punya estimatedPrice)
+ component_stock_history : riwayat perubahan stok tiap barang
+ devices               : perangkat IoT (punya API key & lastSeenAt)
+ sensors               : jenis sensor per device
+ sensor_readings       : data sensor yang masuk dari IoT
+ loans                 : header peminjaman (status, tgl pinjam/kembali)
+ loan_details          : detail barang per peminjaman
+ tickets               : tiket customer service
+ ticket_messages       : pesan/balasan dalam tiket
+ notifications         : notifikasi in-app untuk user
+ audit_logs            : LOG AUDIT (metadata JSONB + index)
+ refresh_tokens       : token refresh sesi login
+
+------------------------------------------------------------
+ 6. RESET TOTAL KE KONDISI AWAL
+------------------------------------------------------------
+  Menghapus semua transaksi/riwayat lalu seed ulang.
+  Cocok untuk "bersih-bersih" sebelum demo/presentasi.
+
+  !!! PERINGATAN: SEMUA DATA AKAN HILANG PERMANEN !!!
+
+  Langkah:
+  1) Nyalakan Docker:
+         cd /d D:\Study\Prototype\ILMS
+         docker compose up -d
+  2) HENTIKAN backend dulu (Ctrl+C di terminal "npm run dev")
+  3) Reset & seed ulang:
+         cd /d D:\Study\Prototype\ILMS\backend
+         npx prisma db push --force-reset
+         npm run prisma:seed
+     (konfirmasi "y" bila muncul)
+  4) Jalankan lagi backend & frontend, buka web.
+
+  Alternatif tanpa hapus total - hanya reset tabel tertentu
+  (backup otomatis ke file .sql lewat pg_dump):
+     docker exec ilms_postgres pg_dump -U postgres -d ilms_db > backup.sql
+     docker exec ilms_postgres psql -U postgres -d ilms_db -c "TRUNCATE audit_logs, sensor_readings CASCADE;"
+     npm run prisma:seed
+
+------------------------------------------------------------
+ 7. HAPUS DATABASE SECARA KESELURUHAN
+------------------------------------------------------------
+     cd /d D:\Study\Prototype\ILMS
+     docker compose down -v
+     docker compose up -d
+     cd backend
+     npx prisma db push
+     npm run prisma:seed
+
+------------------------------------------------------------
+ 8. MENYALIN / MENGHAPUS TABEL SECARA SKEKTIF
+------------------------------------------------------------
+     -- lihat semua tabel
+     docker exec -it ilms_postgres psql -U postgres -d ilms_db -c "\dt"
+
+     -- kosongkan tabel log/riwayat saja (struktur tetap)
+     docker exec -it ilms_postgres psql -U postgres -d ilms_db -c "TRUNCATE audit_logs;"
+     docker exec -it ilms_postgres psql -U postgres -d ilms_db -c "TRUNCATE sensor_readings CASCADE;"
+
+     -- hapus 1 kolom/tabel (hati-hati)
+     docker exec -it ilms_postgres psql -U postgres -d ilms_db -c "DROP TABLE x CASCADE;"
+
+============================================================
+ Lanjut: test otomatis?  ->  04_TESTING_Otomatis.txt
+ Ada error?             ->  05_DEBUGGING_Troubleshooting.txt
+============================================================
