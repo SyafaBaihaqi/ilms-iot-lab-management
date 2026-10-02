@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { request, parseError } from '../services/api';
 import { Loading, EmptyState, StatusBadge, Pagination, Modal, Field } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
+import { isStaffRole } from '../constants/roles';
 
 interface LoanDetailItem {
   id: string;
@@ -25,7 +26,7 @@ interface Loan {
 
 export default function LoansPage() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'Admin';
+  const isStaff = isStaffRole(user?.role);
   const [items, setItems] = useState<Loan[]>([]);
   const [components, setComponents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -146,7 +147,7 @@ export default function LoansPage() {
         <div>
           <h2 className="text-xl font-bold text-slate-800">Peminjaman Komponen</h2>
           <p className="text-sm text-slate-500">
-            {isAdmin ? 'Kelola seluruh pengajuan peminjaman' : 'Ajukan & pantau peminjaman Anda'}
+            {isStaff ? 'Kelola seluruh pengajuan peminjaman' : 'Ajukan & pantau peminjaman Anda'}
           </p>
         </div>
         <button className="btn btn-primary" onClick={openCreate}>
@@ -185,7 +186,7 @@ export default function LoansPage() {
                 <div>
                   <p className="font-semibold text-slate-800">
                     #{loan.id.slice(0, 8).toUpperCase()}
-                    {isAdmin && loan.user && <span className="text-slate-500 font-normal"> · {loan.user.fullName}</span>}
+                    {isStaff && loan.user && <span className="text-slate-500 font-normal"> · {loan.user.fullName}</span>}
                   </p>
                   <p className="text-xs text-slate-400">
                     Pinjam: {new Date(loan.loanDate).toLocaleDateString('id-ID')} · Jatuh tempo:{' '}
@@ -209,7 +210,7 @@ export default function LoansPage() {
                 ))}
               </div>
 
-              {isAdmin && (
+              {isStaff && (
                 <div className="flex gap-2 mt-3">
                   {loan.status === 'Pending' && (
                     <>

@@ -11,7 +11,8 @@
     "serve": "node serve-online.mjs",
     "e2e:qr": "node e2e/qr-scan.e2e.mjs",
     "e2e:qr:all": "node e2e/qr-scenarios.e2e.mjs",
-    "e2e:qr:diag": "node e2e/qr-diag.e2e.mjs"
+    "e2e:qr:diag": "node e2e/qr-diag.e2e.mjs",
+    "e2e:role": "node e2e/role-access.e2e.mjs"
   },
   "dependencies": {
     "axios": "^1.6.8",

@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { ReportController } from '../controllers/report.controller';
 import { authenticateJwt } from '../middlewares/auth.middleware';
-import { requireAdmin } from '../middlewares/role.middleware';
+import { requireStaff } from '../middlewares/role.middleware';
 
 const router = Router();
 
 router.use(authenticateJwt);
-router.use(requireAdmin);
+router.use(requireStaff);
 
 router.get('/inventory', ReportController.inventory);
 router.get('/borrowing', ReportController.borrowing);

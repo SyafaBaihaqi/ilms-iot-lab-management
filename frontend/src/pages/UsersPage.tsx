@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { request, parseError } from '../services/api';
 import { Loading, EmptyState, Pagination, Modal, Field, StatusBadge } from '../components/ui';
+import { ROLE_OPTIONS, ROLE_MAHASISWA, roleLabel } from '../constants/roles';
 
 interface User {
   id: string;
@@ -29,7 +30,7 @@ export default function UsersPage() {
     nim: '',
     password: '',
     phone: '',
-    roleName: 'User'
+roleName: ROLE_MAHASISWA
   });
   const [error, setError] = useState('');
 
@@ -54,7 +55,7 @@ export default function UsersPage() {
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ fullName: '', email: '', username: '', nim: '', password: '', phone: '', roleName: 'User' });
+    setForm({ fullName: '', email: '', username: '', nim: '', password: '', phone: '', roleName: ROLE_MAHASISWA });
     setError('');
     setModalOpen(true);
   };
@@ -68,7 +69,7 @@ export default function UsersPage() {
       nim: u.nim || '',
       password: '',
       phone: u.phone || '',
-      roleName: u.role?.name || 'User'
+      roleName: u.role?.name || ROLE_MAHASISWA
     });
     setError('');
     setModalOpen(true);
@@ -157,7 +158,7 @@ export default function UsersPage() {
                   <td className="table-td">{u.nim || <span className="text-slate-300">-</span>}</td>
                   <td className="table-td">{u.email}</td>
                   <td className="table-td">
-                    <StatusBadge value={u.role?.name || '-'} />
+                    <StatusBadge value={roleLabel(u.role?.name)} />
                   </td>
                   <td className="table-td">
                     <StatusBadge value={u.isActive ? 'Active' : 'Inactive'} />
@@ -221,12 +222,19 @@ export default function UsersPage() {
           </div>
           <Field label="Role">
             <select className="input" value={form.roleName} onChange={(e) => setForm({ ...form, roleName: e.target.value })}>
-              <option value="User">User / Mahasiswa</option>
-              <option value="Admin">Admin</option>
+              {ROLE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </Field>
           <p className="text-xs text-slate-500">
             NIM opsional, tapi bisa dipakai sebagai pengganti username saat login (mis. 2022101). Harus unik.
+          </p>
+          <p className="text-xs text-slate-500">
+            Admin: akses penuh. Dosen: operasional lab tanpa hak kelola pengguna dan log audit. Mahasiswa: peminjam
+            komponen. User: alias umum setara mahasiswa.
           </p>
           <div className="flex gap-2 pt-2">
             <button type="button" className="btn btn-secondary flex-1" onClick={() => setModalOpen(false)}>

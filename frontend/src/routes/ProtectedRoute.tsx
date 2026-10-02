@@ -1,7 +1,8 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { RoleName } from '../constants/roles';
 
-export function ProtectedRoute({ allowedRoles }: { allowedRoles?: ('Admin' | 'User')[] }) {
+export function ProtectedRoute({ allowedRoles }: { allowedRoles?: RoleName[] }) {
   const { user } = useAuth();
 
   if (!user) {

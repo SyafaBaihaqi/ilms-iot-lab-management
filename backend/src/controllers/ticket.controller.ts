@@ -4,14 +4,15 @@ import { createTicketSchema, replyTicketSchema, updateTicketSchema } from '../va
 import { sendSuccess } from '../utils/response';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { auditRequest } from '../utils/audit';
+import { isStaffRole } from '../constants/roles';
 
 export class TicketController {
   static async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const isAdmin = req.user!.role === 'Admin';
+      const isStaff = isStaffRole(req.user!.role);
       const result = await TicketService.getAll({
         userId: req.user!.userId,
-        isAdmin,
+        isAdmin: isStaff,
         status: req.query.status as any,
         priority: req.query.priority as any,
         search: req.query.search as string | undefined,
@@ -26,8 +27,8 @@ export class TicketController {
 
   static async getStats(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const isAdmin = req.user!.role === 'Admin';
-      const result = await TicketService.getStats(req.user!.userId, isAdmin);
+      const isStaff = isStaffRole(req.user!.role);
+      const result = await TicketService.getStats(req.user!.userId, isStaff);
       return sendSuccess(res, result);
     } catch (err) {
       next(err);
@@ -36,8 +37,8 @@ export class TicketController {
 
   static async getById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const isAdmin = req.user!.role === 'Admin';
-      const result = await TicketService.getById(req.params.id, req.user!.userId, isAdmin);
+      const isStaff = isStaffRole(req.user!.role);
+      const result = await TicketService.getById(req.params.id, req.user!.userId, isStaff);
       return sendSuccess(res, result);
     } catch (err) {
       next(err);
@@ -61,15 +62,15 @@ export class TicketController {
   static async reply(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const validated = replyTicketSchema.parse(req.body);
-      const isAdmin = req.user!.role === 'Admin';
+      const isStaff = isStaffRole(req.user!.role);
       const result = await TicketService.reply(
         req.params.id,
         req.user!.userId,
-        isAdmin,
+        isStaff,
         validated.message
       );
       await auditRequest(req, 'ticket.reply', 'Ticket', req.params.id, {
-        asAdmin: isAdmin
+        asStaff: isStaff
       });
       return sendSuccess(res, result, 'Balasan berhasil dikirim', 201);
     } catch (err) {
@@ -92,8 +93,8 @@ export class TicketController {
 
   static async close(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const isAdmin = req.user!.role === 'Admin';
-      const result = await TicketService.closeOwn(req.params.id, req.user!.userId, isAdmin);
+      const isStaff = isStaffRole(req.user!.role);
+      const result = await TicketService.closeOwn(req.params.id, req.user!.userId, isStaff);
       await auditRequest(req, 'ticket.close', 'Ticket', req.params.id);
       return sendSuccess(res, result, 'Ticket ditutup');
     } catch (err) {
@@ -103,8 +104,8 @@ export class TicketController {
 
   static async remove(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const isAdmin = req.user!.role === 'Admin';
-      const result = await TicketService.remove(req.params.id, req.user!.userId, isAdmin);
+      const isStaff = isStaffRole(req.user!.role);
+      const result = await TicketService.remove(req.params.id, req.user!.userId, isStaff);
       await auditRequest(req, 'ticket.delete', 'Ticket', req.params.id);
       return sendSuccess(res, result, 'Ticket berhasil dihapus');
     } catch (err) {

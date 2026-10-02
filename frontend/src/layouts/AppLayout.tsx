@@ -1,18 +1,22 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
+import { RoleName, ROLE_ADMIN, ROLE_DOSEN, ROLE_MAHASISWA, ROLE_USER, roleLabel } from '../constants/roles';
 
-const navItems = [
-  { to: '/', label: 'Dashboard', icon: '📊', roles: ['Admin'] },
-  { to: '/inventory', label: 'Inventori', icon: '📦', roles: ['Admin', 'User'] },
-  { to: '/categories', label: 'Kategori', icon: '🗂️', roles: ['Admin'] },
-  { to: '/loans', label: 'Peminjaman', icon: '🔁', roles: ['Admin', 'User'] },
-  { to: '/devices', label: 'Perangkat IoT', icon: '📡', roles: ['Admin'] },
-  { to: '/sensors', label: 'Monitoring Sensor', icon: '📈', roles: ['Admin'] },
-  { to: '/reports', label: 'Laporan', icon: '📄', roles: ['Admin'] },
-  { to: '/audit-logs', label: 'Log Audit', icon: '🕵️', roles: ['Admin'] },
-  { to: '/support', label: 'Customer Service', icon: '🎧', roles: ['Admin', 'User'] },
-  { to: '/users', label: 'Pengguna', icon: '👥', roles: ['Admin'] }
+const STAFF: RoleName[] = [ROLE_ADMIN, ROLE_DOSEN];
+const ALL: RoleName[] = [ROLE_ADMIN, ROLE_DOSEN, ROLE_MAHASISWA, ROLE_USER];
+
+const navItems: { to: string; label: string; icon: string; roles: RoleName[] }[] = [
+  { to: '/', label: 'Dashboard', icon: '📊', roles: STAFF },
+  { to: '/inventory', label: 'Inventori', icon: '📦', roles: ALL },
+  { to: '/categories', label: 'Kategori', icon: '🗂️', roles: STAFF },
+  { to: '/loans', label: 'Peminjaman', icon: '🔁', roles: ALL },
+  { to: '/devices', label: 'Perangkat IoT', icon: '📡', roles: STAFF },
+  { to: '/sensors', label: 'Monitoring Sensor', icon: '📈', roles: STAFF },
+  { to: '/reports', label: 'Laporan', icon: '📄', roles: STAFF },
+  { to: '/audit-logs', label: 'Log Audit', icon: '🕵️', roles: [ROLE_ADMIN] },
+  { to: '/support', label: 'Customer Service', icon: '🎧', roles: ALL },
+  { to: '/users', label: 'Pengguna', icon: '👥', roles: [ROLE_ADMIN] }
 ];
 
 export default function AppLayout() {
@@ -141,7 +145,7 @@ export default function AppLayout() {
                 </span>
                 <span className="hidden sm:block">
                   <span className="block text-xs font-medium">{user?.fullName}</span>
-                  <span className="block text-[10px] text-slate-400">{user?.role}</span>
+                  <span className="block text-[10px] text-slate-400">{roleLabel(user?.role)}</span>
                 </span>
               </NavLink>
               <button

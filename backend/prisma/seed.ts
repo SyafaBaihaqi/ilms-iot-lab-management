@@ -7,12 +7,34 @@ async function main() {
   console.log('Seeding initial ILMS data...');
 
   // 1. Roles
+  // Admin : akses penuh
+  // Dosen : Admin tanpa Manajemen Pengguna dan Log Audit
+  // Mahasiswa: peminjam komponen
+  // User : alias umum, setara Mahasiswa, dipakai akun lama
   const adminRole = await prisma.role.upsert({
     where: { name: 'Admin' },
     update: {},
     create: {
       name: 'Admin',
-      description: 'Pengelola laboratorium / dosen / laboran'
+      description: 'Pengelola laboratorium / kepala laboratorium'
+    }
+  });
+
+  const dosenRole = await prisma.role.upsert({
+    where: { name: 'Dosen' },
+    update: {},
+    create: {
+      name: 'Dosen',
+      description: 'Dosen pengampu: mengelola operasional lab tanpa hak akses pengguna dan log audit'
+    }
+  });
+
+  await prisma.role.upsert({
+    where: { name: 'Mahasiswa' },
+    update: {},
+    create: {
+      name: 'Mahasiswa',
+      description: 'Mahasiswa / peminjam komponen laboratorium'
     }
   });
 
@@ -21,11 +43,11 @@ async function main() {
     update: {},
     create: {
       name: 'User',
-      description: 'Mahasiswa / peminjam komponen laboratorium'
+      description: 'Role umum, setara hak akses Mahasiswa'
     }
   });
 
-  console.log('Roles created:', adminRole.name, userRole.name);
+  console.log('Roles created:', adminRole.name, dosenRole.name, 'Mahasiswa', userRole.name);
 
   // 2. Default Users
   const salt = await bcrypt.genSalt(10);

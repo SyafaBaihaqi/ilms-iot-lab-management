@@ -2,22 +2,23 @@ import { useCallback, useEffect, useState } from 'react';
 import { request, parseError } from '../services/api';
 import { Loading, EmptyState, StatusBadge, Pagination, Modal, Field, StatCard } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
+import { isStaffRole } from '../constants/roles';
 
-type SupportMode = 'admin' | 'user';
+type SupportMode = 'staff' | 'user';
 
 function SupportLogo({ mode }: { mode: SupportMode }) {
-  const isAdmin = mode === 'admin';
+  const isStaff = mode === 'staff';
 
   return (
     <div
       className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm ${
-        isAdmin ? 'bg-gradient-to-br from-blue-600 to-blue-700' : 'bg-gradient-to-br from-emerald-500 to-emerald-600'
+        isStaff ? 'bg-gradient-to-br from-blue-600 to-blue-700' : 'bg-gradient-to-br from-emerald-500 to-emerald-600'
       }`}
-      title={isAdmin ? 'Mode Admin - Kelola Tiket' : 'Mode User - Ajukan Tiket'}
-      aria-label={isAdmin ? 'Logo Customer Service Admin' : 'Logo Customer Service User'}
+      title={isStaff ? 'Mode Dosen/Admin - Kelola Tiket' : 'Mode Mahasiswa - Ajukan Tiket'}
+      aria-label={isStaff ? 'Logo Customer Service Dosen dan Admin' : 'Logo Customer Service Mahasiswa'}
     >
       <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        {isAdmin ? (
+        {isStaff ? (
           <>
             <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
             <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
@@ -74,7 +75,7 @@ const PRIORITY_OPTIONS = ['Low', 'Medium', 'High', 'Urgent'];
 
 export default function SupportPage() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'Admin';
+  const isStaff = isStaffRole(user?.role);
 
   const [items, setItems] = useState<Ticket[]>([]);
   const [stats, setStats] = useState<TicketStats>({
@@ -243,11 +244,11 @@ export default function SupportPage() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
-          <SupportLogo mode={isAdmin ? 'admin' : 'user'} />
+          <SupportLogo mode={isStaff ? 'staff' : 'user'} />
           <div>
             <h2 className="text-xl font-bold text-slate-800">Customer Service</h2>
             <p className="text-sm text-slate-500">
-              {isAdmin
+              {isStaff
                 ? 'Kelola seluruh tiket pertanyaan dari pengguna'
                 : 'Ajukan pertanyaan kapan saja, admin lab akan membalas di sini'}
             </p>
@@ -284,7 +285,7 @@ export default function SupportPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2">
-          {isAdmin && (
+          {isStaff && (
             <input
               className="input sm:max-w-xs"
               placeholder="Cari subjek / nama pengguna..."
@@ -333,7 +334,7 @@ export default function SupportPage() {
                       #{ticket.id.slice(0, 8).toUpperCase()} · {ticket.subject}
                     </p>
                     <p className="text-xs text-slate-400">
-                      {isAdmin && ticket.user ? `${ticket.user.fullName} (${ticket.user.username}) · ` : ''}
+                      {isStaff && ticket.user ? `${ticket.user.fullName} (${ticket.user.username}) · ` : ''}
                       Dibuat {formatDate(ticket.createdAt)}
                       {ticket._count ? ` · ${ticket._count.messages} pesan` : ''}
                       {ticket.closedAt ? ` · Ditutup ${formatDate(ticket.closedAt)}` : ''}
@@ -348,7 +349,7 @@ export default function SupportPage() {
                 {last && (
                   <p className="mt-2 text-sm text-slate-600 line-clamp-2 bg-slate-50 rounded-lg px-3 py-2">
                     <span className="text-slate-400 text-xs">
-                      {last.isAdmin ? 'Admin' : last.sender?.fullName || 'Pengguna'}:{' '}
+                      {last.sender?.fullName || (last.isAdmin ? 'Admin' : 'Pengguna')}:{' '}
                     </span>
                     {last.message}
                   </p>
@@ -431,7 +432,7 @@ export default function SupportPage() {
               <div className="text-xs text-slate-400">
                 <p>
                   #{detail.id.slice(0, 8).toUpperCase()} ·{' '}
-                  {isAdmin ? `${detail.user?.fullName} (${detail.user?.username})` : detail.user?.username}
+                  {isStaff ? `${detail.user?.fullName} (${detail.user?.username})` : detail.user?.username}
                 </p>
                 <p>Dibuat {formatDate(detail.createdAt)}</p>
                 {detail.assignee && <p>Ditangani: {detail.assignee.fullName}</p>}
@@ -442,7 +443,7 @@ export default function SupportPage() {
               </div>
             </div>
 
-            {isAdmin && (
+            {isStaff && (
               <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 items-end bg-slate-50 rounded-lg p-3">
                 <Field label="Status">
                   <select className="input" value={adminStatus} onChange={(e) => setAdminStatus(e.target.value)}>
@@ -484,7 +485,7 @@ export default function SupportPage() {
                       }`}
                     >
                       <p className={`text-[10px] mb-0.5 ${m.isAdmin ? 'text-blue-100' : 'text-slate-400'}`}>
-                        {m.isAdmin ? 'Admin' : m.sender?.fullName || 'Pengguna'} · {formatDate(m.createdAt)}
+                        {m.sender?.fullName || (m.isAdmin ? 'Admin' : 'Pengguna')} · {formatDate(m.createdAt)}
                       </p>
                       <p className="whitespace-pre-wrap break-words">{m.message}</p>
                     </div>
@@ -493,7 +494,7 @@ export default function SupportPage() {
               )}
             </div>
 
-            {detail.status !== 'Closed' || isAdmin ? (
+            {detail.status !== 'Closed' || isStaff ? (
               <form onSubmit={sendReply} className="space-y-2 border-t border-slate-200 pt-3">
                 {replyError && (
                   <div className="rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs px-3 py-2">
@@ -505,14 +506,14 @@ export default function SupportPage() {
                   rows={3}
                   value={reply}
                   onChange={(e) => setReply(e.target.value)}
-                  placeholder={isAdmin ? 'Tulis balasan untuk pengguna...' : 'Tulis pesan tambahan...'}
+                  placeholder={isStaff ? 'Tulis balasan untuk pengguna...' : 'Tulis pesan tambahan...'}
                   required
                 />
                 <div className="flex flex-wrap gap-2">
                   <button type="submit" className="btn btn-primary flex-1">
                     Kirim Balasan
                   </button>
-                  {!isAdmin && detail.status !== 'Closed' && (
+                  {!isStaff && detail.status !== 'Closed' && (
                     <button type="button" className="btn btn-secondary" onClick={closeTicket}>
                       Tutup Tiket
                     </button>

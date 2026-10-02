@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { request } from '../services/api';
+import { RoleName } from '../constants/roles';
 
 export interface AuthUser {
   id: string;
@@ -7,7 +8,7 @@ export interface AuthUser {
   username: string;
   nim?: string;
   email: string;
-  role: 'Admin' | 'User';
+  role: RoleName;
   phone?: string;
   photoUrl?: string;
 }

@@ -1,5 +1,6 @@
 import prisma from '../utils/prisma';
 import { hashPassword } from '../utils/jwt';
+import { RoleName } from '../constants/roles';
 
 export class UserService {
   static async getAll(options: { search?: string; page?: number; limit?: number }) {
@@ -44,7 +45,7 @@ export class UserService {
     };
   }
 
-  static async create(data: { fullName: string; email: string; username: string; password: string; nim?: string | null; phone?: string; roleName: 'Admin' | 'User' }) {
+  static async create(data: { fullName: string; email: string; username: string; password: string; nim?: string | null; phone?: string; roleName: RoleName }) {
     const existing = await prisma.user.findFirst({
       where: {
         OR: [

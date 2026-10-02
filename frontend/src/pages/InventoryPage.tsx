@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import api, { request, parseError } from '../services/api';
 import { Loading, EmptyState, StatusBadge, Pagination, Modal, Field } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
+import { isStaffRole } from '../constants/roles';
 
 interface Category {
   id: string;
@@ -48,7 +49,7 @@ const sortOptions = [
 
 export default function InventoryPage() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'Admin';
+  const isStaff = isStaffRole(user?.role);
   const [items, setItems] = useState<Component[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,8 +127,8 @@ export default function InventoryPage() {
   }, [fetchData]);
 
   useEffect(() => {
-    if (isAdmin) fetchCategories();
-  }, [isAdmin, fetchCategories]);
+    if (isStaff) fetchCategories();
+  }, [isStaff, fetchCategories]);
 
   // QR yang dipindai membuka /inventory?component=<id>.
   // Ambil datanya langsung (bukan lewat search) supaya pasti ketemu,
@@ -259,7 +260,7 @@ export default function InventoryPage() {
           <h2 className="text-xl font-bold text-slate-800">Inventori Komponen</h2>
           <p className="text-sm text-slate-500">Kelola stok komponen & perangkat laboratorium</p>
         </div>
-        {isAdmin && (
+        {isStaff && (
           <button className="btn btn-primary" onClick={openCreate}>
             + Tambah Komponen
           </button>
@@ -313,7 +314,7 @@ export default function InventoryPage() {
             <button className="btn btn-secondary !py-1 text-xs" onClick={() => handleQrCode(scanned)}>
               Unduh QR
             </button>
-            {isAdmin && (
+            {isStaff && (
               <button className="btn btn-secondary !py-1 text-xs" onClick={() => openEdit(scanned)}>
                 Edit
               </button>
@@ -344,7 +345,7 @@ export default function InventoryPage() {
                 <th className="table-th">Lokasi</th>
                 <th className="table-th">Status</th>
                 <th className="table-th">QR</th>
-                {isAdmin && <th className="table-th">Aksi</th>}
+                {isStaff && <th className="table-th">Aksi</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
@@ -386,7 +387,7 @@ export default function InventoryPage() {
                       {qrLoadingId === c.id ? 'Membuat...' : '⬇ QR'}
                     </button>
                   </td>
-                  {isAdmin && (
+                  {isStaff && (
                     <td className="table-td">
                       <div className="flex gap-2">
                         <button className="text-blue-600 hover:underline text-xs" onClick={() => openEdit(c)}>

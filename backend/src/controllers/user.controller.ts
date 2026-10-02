@@ -4,7 +4,7 @@ import { sendSuccess } from '../utils/response';
 import { auditRequest } from '../utils/audit';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { z } from 'zod';
-import { nimSchema } from '../validators/auth.validator';
+import { nimSchema, roleNameSchema } from '../validators/auth.validator';
 
 const createUserSchema = z.object({
   fullName: z.string().min(2),
@@ -13,7 +13,7 @@ const createUserSchema = z.object({
   password: z.string().min(6),
   nim: nimSchema,
   phone: z.string().optional(),
-  roleName: z.enum(['Admin', 'User'])
+  roleName: roleNameSchema
 });
 
 const updateUserSchema = z.object({
@@ -22,7 +22,7 @@ const updateUserSchema = z.object({
   nim: nimSchema,
   phone: z.string().optional(),
   isActive: z.boolean().optional(),
-  roleName: z.enum(['Admin', 'User']).optional(),
+  roleName: roleNameSchema.optional(),
   password: z.string().min(6).optional()
 });
 

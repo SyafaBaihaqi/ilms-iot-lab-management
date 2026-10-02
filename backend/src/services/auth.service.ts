@@ -1,5 +1,6 @@
 import prisma from '../utils/prisma';
 import { hashPassword, comparePassword, generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
+import { RoleName } from '../constants/roles';
 
 export class AuthService {
   static async login(username: string, password: string) {
@@ -62,7 +63,7 @@ export class AuthService {
     password: string;
     nim?: string | null;
     phone?: string;
-    roleName: 'Admin' | 'User';
+    roleName: RoleName;
   }) {
     const existing = await prisma.user.findFirst({
       where: {

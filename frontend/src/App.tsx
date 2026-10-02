@@ -15,6 +15,10 @@ import SupportPage from './pages/SupportPage';
 import ProfilePage from './pages/ProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
 import { ErrorBoundary } from './components/ui';
+import { RoleName, ROLE_ADMIN, ROLE_DOSEN } from './constants/roles';
+
+const STAFF: RoleName[] = [ROLE_ADMIN, ROLE_DOSEN];
+const ADMIN_ONLY: RoleName[] = [ROLE_ADMIN];
 
 export default function App() {
   return (
@@ -28,15 +32,24 @@ export default function App() {
         {/* Protected */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route path="/" element={<DashboardPage />} />
+            {/* Dosen dan Admin boleh masuk; mahasiswa diarahkan ke inventori */}
+            <Route element={<ProtectedRoute allowedRoles={STAFF} />}>
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/categories" element={<CategoriesPage />} />
+              <Route path="/devices" element={<DevicesPage />} />
+              <Route path="/sensors" element={<SensorsPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+            </Route>
+
+            {/* Hanya Admin */}
+            <Route element={<ProtectedRoute allowedRoles={ADMIN_ONLY} />}>
+              <Route path="/audit-logs" element={<AuditLogsPage />} />
+              <Route path="/users" element={<UsersPage />} />
+            </Route>
+
+            {/* Semua peran */}
             <Route path="/inventory" element={<InventoryPage />} />
-            <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/loans" element={<LoansPage />} />
-            <Route path="/devices" element={<DevicesPage />} />
-            <Route path="/sensors" element={<SensorsPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/audit-logs" element={<AuditLogsPage />} />
-            <Route path="/users" element={<UsersPage />} />
             <Route path="/support" element={<SupportPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>

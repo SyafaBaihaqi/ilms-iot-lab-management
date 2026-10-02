@@ -1,5 +1,6 @@
 import prisma from '../utils/prisma';
 import { TicketPriority, TicketStatus } from '@prisma/client';
+import { STAFF_ROLES } from '../constants/roles';
 
 const ticketInclude = {
   user: { select: { id: true, fullName: true, username: true, email: true } },
@@ -11,17 +12,18 @@ const ticketInclude = {
 };
 
 export class TicketService {
+  /** Tiket baru sampai ke Admin dan Dosen, bukan hanya Admin. */
   static async notifyAdmins(title: string, message: string) {
-    const admins = await prisma.user.findMany({
-      where: { role: { name: 'Admin' }, isActive: true, deletedAt: null },
+    const staff = await prisma.user.findMany({
+      where: { role: { name: { in: [...STAFF_ROLES] } }, isActive: true, deletedAt: null },
       select: { id: true }
     });
 
-    if (admins.length === 0) return;
+    if (staff.length === 0) return;
 
     await prisma.notification.createMany({
-      data: admins.map((admin) => ({
-        userId: admin.id,
+      data: staff.map((recipient) => ({
+        userId: recipient.id,
         type: 'ticket',
         title,
         message

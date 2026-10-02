@@ -4,14 +4,15 @@ import { createLoanSchema, returnLoanSchema } from '../validators/loan.validator
 import { sendSuccess } from '../utils/response';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { auditRequest } from '../utils/audit';
+import { isStaffRole } from '../constants/roles';
 
 export class LoanController {
   static async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const isAdmin = req.user!.role === 'Admin';
+const isStaff = isStaffRole(req.user!.role);
       const result = await LoanService.getAll({
         userId: req.user!.userId,
-        isAdmin,
+        isAdmin: isStaff,
         status: req.query.status as any,
         page: Number(req.query.page),
         limit: Number(req.query.limit)
@@ -24,8 +25,8 @@ export class LoanController {
 
   static async getById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const isAdmin = req.user!.role === 'Admin';
-      const result = await LoanService.getById(req.params.id, req.user!.userId, isAdmin);
+      const isStaff = isStaffRole(req.user!.role);
+      const result = await LoanService.getById(req.params.id, req.user!.userId, isStaff);
       return sendSuccess(res, result);
     } catch (err) {
       next(err);

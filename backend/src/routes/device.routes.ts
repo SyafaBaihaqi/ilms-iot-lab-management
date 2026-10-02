@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { DeviceController } from '../controllers/device.controller';
 import { authenticateJwt } from '../middlewares/auth.middleware';
-import { requireAdmin } from '../middlewares/role.middleware';
+import { requireStaff } from '../middlewares/role.middleware';
 import { authenticateApiKey } from '../middlewares/apiKey.middleware';
 
 const router = Router();
@@ -11,9 +11,9 @@ router.post('/register', DeviceController.register);
 router.post('/heartbeat', authenticateApiKey, DeviceController.heartbeat);
 router.get('/:id/config', authenticateApiKey, DeviceController.getConfig);
 
-// ===== Admin Management Endpoints (JWT) =====
+// ===== Staff Management Endpoints (JWT, Admin + Dosen) =====
 router.use(authenticateJwt);
-router.use(requireAdmin);
+router.use(requireStaff);
 
 router.get('/', DeviceController.getAll);
 router.post('/', DeviceController.create);

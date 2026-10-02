@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { request, parseError } from '../services/api';
 import { StatCard, Loading, EmptyState, StatusBadge } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
+import { isStaffRole } from '../constants/roles';
 
 interface Summary {
   inventory: { totalComponents: number; stockTotal: number; stockAvailable: number; stockBorrowed: number };
@@ -21,7 +22,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.role !== 'Admin') {
+    if (!isStaffRole(user?.role)) {
       navigate('/inventory');
       return;
     }
@@ -32,7 +33,7 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, [user, navigate]);
 
-  if (user?.role !== 'Admin') return null;
+  if (!isStaffRole(user?.role)) return null;
   if (loading) return <Loading text="Memuat dashboard..." />;
   if (error) return <div className="text-red-600 text-sm">Gagal memuat dashboard: {error}</div>;
   if (!data) return <EmptyState />;
@@ -42,7 +43,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-slate-800">Dashboard Admin</h2>
+        <h2 className="text-xl font-bold text-slate-800">Dashboard Laboratorium</h2>
         <p className="text-sm text-slate-500">Ringkasan kondisi laboratorium saat ini</p>
       </div>
 

@@ -2,6 +2,8 @@ import prisma from '../src/utils/prisma';
 import { hashPassword } from '../src/utils/jwt';
 
 export const ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' };
+export const DOSEN_CREDENTIALS = { username: 'dosen1', password: 'dosen123' };
+export const MAHASISWA_CREDENTIALS = { username: 'mhs1', password: 'user123' };
 export const USER_CREDENTIALS = { username: 'mahasiswa1', password: 'user123' };
 export const OTHER_CREDENTIALS = { username: 'mahasiswa2', password: 'user123' };
 
@@ -26,16 +28,27 @@ export const seedFixtures = async () => {
   const adminRole = await prisma.role.upsert({
     where: { name: 'Admin' },
     update: {},
-    create: { name: 'Admin' }
+    create: { name: 'Admin', description: 'Akses penuh' }
+  });
+  const dosenRole = await prisma.role.upsert({
+    where: { name: 'Dosen' },
+    update: {},
+    create: { name: 'Dosen', description: 'Operasional lab tanpa pengguna dan audit' }
+  });
+  const mahasiswaRole = await prisma.role.upsert({
+    where: { name: 'Mahasiswa' },
+    update: {},
+    create: { name: 'Mahasiswa', description: 'Peminjam komponen' }
   });
   const userRole = await prisma.role.upsert({
     where: { name: 'User' },
     update: {},
-    create: { name: 'User' }
+    create: { name: 'User', description: 'Alias umum, setara Mahasiswa' }
   });
 
   const adminHash = await hashPassword(ADMIN_CREDENTIALS.password);
   const userHash = await hashPassword(USER_CREDENTIALS.password);
+  const dosenHash = await hashPassword(DOSEN_CREDENTIALS.password);
 
   const admin = await prisma.user.create({
     data: {
@@ -44,6 +57,28 @@ export const seedFixtures = async () => {
       fullName: 'Admin Test',
       passwordHash: adminHash,
       roleId: adminRole.id
+    }
+  });
+
+  const dosen = await prisma.user.create({
+    data: {
+      username: DOSEN_CREDENTIALS.username,
+      email: 'dosen@test.local',
+      fullName: 'Dosen Test',
+      nim: '198501012010011001',
+      passwordHash: dosenHash,
+      roleId: dosenRole.id
+    }
+  });
+
+  const mahasiswa = await prisma.user.create({
+    data: {
+      username: MAHASISWA_CREDENTIALS.username,
+      email: 'mhs@test.local',
+      fullName: 'Mahasiswa Role Test',
+      nim: '2022103',
+      passwordHash: userHash,
+      roleId: mahasiswaRole.id
     }
   });
 
@@ -85,7 +120,7 @@ export const seedFixtures = async () => {
     }
   });
 
-  return { admin, user, otherUser, category, component };
+  return { admin, dosen, mahasiswa, user, otherUser, category, component, roles: { adminRole, dosenRole, mahasiswaRole, userRole } };
 };
 
 export const disconnect = async () => {
