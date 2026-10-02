@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api, { request, parseError } from '../services/api';
 import { Loading, EmptyState, StatusBadge, Pagination, Modal, Field } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
@@ -59,6 +60,8 @@ export default function InventoryPage() {
   const [editing, setEditing] = useState<Component | null>(null);
   const [form, setForm] = useState({ ...emptyForm });
   const [sortBy, setSortBy] = useState('createdAt_desc');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [scanned, setScanned] = useState<Component | null>(null);
 
   const tableWrapRef = useRef<HTMLDivElement>(null);
   const lastWheelFlip = useRef(0);
@@ -122,6 +125,46 @@ export default function InventoryPage() {
   useEffect(() => {
     if (isAdmin) fetchCategories();
   }, [isAdmin, fetchCategories]);
+
+  // QR yang dipindai membuka /inventory?component=<id>.
+  // Ambil datanya langsung (bukan lewat search) supaya pasti ketemu,
+  // lalu saring tabel ke kode inventori + sorot barisnya.
+  useEffect(() => {
+    const componentId = searchParams.get('component');
+    if (!componentId) return;
+
+    let cancelled = false;
+    setLoading(true);
+
+    (async () => {
+      try {
+        const res = await request<any>('GET', `/components/${componentId}`);
+        const data = res.data;
+        if (cancelled || !data?.id) return;
+        setScanned(data);
+        setSearch(data.inventoryCode || '');
+        setPage(1);
+      } catch (err) {
+        if (!cancelled) {
+          setScanned(null);
+          setError(parseError(err) || 'Komponen dari QR tidak ditemukan.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    setSearchParams({}, { replace: true });
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams, setSearchParams]);
+
+  const clearScanned = () => {
+    setScanned(null);
+    setSearch('');
+    setPage(1);
+  };
 
   const openCreate = () => {
     setEditing(null);
@@ -240,6 +283,32 @@ export default function InventoryPage() {
         </span>
       </div>
 
+      {scanned && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="text-sm text-blue-800">
+            <span className="font-semibold">Hasil pindai QR:</span>{' '}
+            {scanned.name} <span className="text-blue-600">({scanned.inventoryCode})</span>
+            <span className="block text-xs text-blue-700">
+              Stok tersedia {scanned.stockAvailable}/{scanned.stockTotal}
+              {scanned.location ? ` · Lokasi: ${scanned.location}` : ''}
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <button className="btn btn-secondary !py-1 text-xs" onClick={() => handleQrCode(scanned)}>
+              Unduh QR
+            </button>
+            {isAdmin && (
+              <button className="btn btn-secondary !py-1 text-xs" onClick={() => openEdit(scanned)}>
+                Edit
+              </button>
+            )}
+            <button className="btn btn-secondary !py-1 text-xs" onClick={clearScanned}>
+              Tutup
+            </button>
+          </div>
+        </div>
+      )}
+
       {error && <div className="rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2">{error}</div>}
 
       <div className="card overflow-x-auto" ref={tableWrapRef}>
@@ -264,7 +333,14 @@ export default function InventoryPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
               {items.map((c) => (
-                <tr key={c.id} className="hover:bg-slate-50">
+                <tr
+                  key={c.id}
+                  className={
+                    scanned?.id === c.id
+                      ? 'bg-blue-50 ring-2 ring-inset ring-blue-300'
+                      : 'hover:bg-slate-50'
+                  }
+                >
                   <td className="table-td">
                     <span className="font-medium text-slate-800">{c.name}</span>
                     {c.description && <p className="text-xs text-slate-400 line-clamp-1">{c.description}</p>}
