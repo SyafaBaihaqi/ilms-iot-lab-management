@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute, PublicOnlyRoute } from './routes/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
 import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
+import HomePage from './pages/HomePage';
 import InventoryPage from './pages/InventoryPage';
 import CategoriesPage from './pages/CategoriesPage';
 import LoansPage from './pages/LoansPage';
@@ -32,9 +32,11 @@ export default function App() {
         {/* Protected */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            {/* Dosen dan Admin boleh masuk; mahasiswa diarahkan ke inventori */}
+            {/* Semua peran punya dashboard sendiri sesuai perannya */}
+            <Route path="/" element={<HomePage />} />
+
+            {/* Dosen dan Admin boleh masuk */}
             <Route element={<ProtectedRoute allowedRoles={STAFF} />}>
-              <Route path="/" element={<DashboardPage />} />
               <Route path="/categories" element={<CategoriesPage />} />
               <Route path="/devices" element={<DevicesPage />} />
               <Route path="/sensors" element={<SensorsPage />} />

@@ -7,7 +7,7 @@ const STAFF: RoleName[] = [ROLE_ADMIN, ROLE_DOSEN];
 const ALL: RoleName[] = [ROLE_ADMIN, ROLE_DOSEN, ROLE_MAHASISWA, ROLE_USER];
 
 const navItems: { to: string; label: string; icon: string; roles: RoleName[] }[] = [
-  { to: '/', label: 'Dashboard', icon: '📊', roles: STAFF },
+  { to: '/', label: 'Dashboard', icon: '📊', roles: ALL },
   { to: '/inventory', label: 'Inventori', icon: '📦', roles: ALL },
   { to: '/categories', label: 'Kategori', icon: '🗂️', roles: STAFF },
   { to: '/loans', label: 'Peminjaman', icon: '🔁', roles: ALL },

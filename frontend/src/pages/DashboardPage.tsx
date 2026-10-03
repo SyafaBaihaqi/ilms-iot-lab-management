@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { request, parseError } from '../services/api';
 import { StatCard, Loading, EmptyState, StatusBadge } from '../components/ui';
-import { useAuth } from '../context/AuthContext';
-import { isStaffRole } from '../constants/roles';
 
 interface Summary {
   inventory: { totalComponents: number; stockTotal: number; stockAvailable: number; stockBorrowed: number };
@@ -14,26 +11,19 @@ interface Summary {
   categories: { name: string; count: number }[];
 }
 
+/** Dashboardlaboratorium untuk Admin dan Dosen. Pilihan peran ada di `HomePage`. */
 export default function DashboardPage() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [data, setData] = useState<Summary | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isStaffRole(user?.role)) {
-      navigate('/inventory');
-      return;
-    }
-
     request<any>('GET', '/dashboard/summary')
       .then((res) => setData(res.data))
       .catch((err) => setError(parseError(err)))
       .finally(() => setLoading(false));
-  }, [user, navigate]);
+  }, []);
 
-  if (!isStaffRole(user?.role)) return null;
   if (loading) return <Loading text="Memuat dashboard..." />;
   if (error) return <div className="text-red-600 text-sm">Gagal memuat dashboard: {error}</div>;
   if (!data) return <EmptyState />;
