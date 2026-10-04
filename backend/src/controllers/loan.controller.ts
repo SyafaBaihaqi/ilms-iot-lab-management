@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { LoanService } from '../services/loan.service';
+import { ReportService } from '../services/report.service';
+import { buildLoanLetterPdf } from '../services/pdf.service';
 import { createLoanSchema, returnLoanSchema } from '../validators/loan.validator';
-import { sendSuccess } from '../utils/response';
+import { sendSuccess, sendError } from '../utils/response';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { auditRequest } from '../utils/audit';
 import { isStaffRole } from '../constants/roles';
@@ -75,6 +77,35 @@ const isStaff = isStaffRole(req.user!.role);
         returnedItems: validated.items.length
       });
       return sendSuccess(res, result, 'Return processed successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /** Surat peminjaman PDF; khusus staff. */
+  static async letter(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      if (!isStaffRole(req.user!.role)) {
+        return sendError(res, 'Hanya staff yang dapat membuat surat peminjaman', 403, 'FORBIDDEN');
+      }
+
+      const letter = await ReportService.getLoanLetter(req.params.id);
+      if (!letter) {
+        return sendError(res, 'Peminjaman tidak ditemukan', 404, 'NOT_FOUND');
+      }
+
+      if (String(req.query.format || 'json').toLowerCase() === 'pdf') {
+        const buffer = await buildLoanLetterPdf(letter);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader(
+          'Content-Disposition',
+          `attachment; filename="surat-peminjaman-${letter.loanCode}.pdf"`
+        );
+        res.setHeader('Content-Length', buffer.length);
+        return res.send(buffer);
+      }
+
+      return sendSuccess(res, letter);
     } catch (err) {
       next(err);
     }

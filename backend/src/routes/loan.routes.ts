@@ -8,6 +8,7 @@ const router = Router();
 router.use(authenticateJwt);
 
 router.get('/', LoanController.getAll);
+router.get('/:id/letter', requireStaff, LoanController.letter);
 router.get('/:id', LoanController.getById);
 router.post('/', requireAnyRole, LoanController.create);
 router.put('/:id/approve', requireStaff, LoanController.approve);
