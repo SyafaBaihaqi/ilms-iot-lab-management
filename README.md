@@ -4,17 +4,19 @@ Sistem manajemen laboratorium IoT berbasis web: manajemen inventaris komponen, p
 
 ## Fitur
 
-- Autentikasi & RBAC (Admin / User) dengan JWT + Refresh Token
+- Autentikasi & RBAC (Admin / Dosen / Mahasiswa / User) dengan JWT + Refresh Token
 - Manajemen komponen, kategori, stok real-time, dan riwayat stok
 - Alur peminjaman-pengembalian (ajukan → approve/reject → return) yang dibungkus transaksi database
-- Dashboard statistik admin
-- Laporan inventaris/peminjaman/kerusakan/IoT dengan ekspor CSV
+- Dashboard statistik (Admin/Dosen), Dashboard Mahasiswa, dan Dashboard sederhana untuk User
+- Laporan inventaris/peminjaman/kerusakan/IoT dengan ekspor CSV, Excel (.xlsx), dan PDF (multi halaman)
+- Surat peminjaman komponen per transaksi (PDF) untuk Admin/Dosen
 - PWA: installable + offline shell (service worker via vite-plugin-pwa)
 - Integrasi ESP32: registrasi, heartbeat, dan pengiriman data sensor via API key khusus
 - Notifikasi in-app, log audit lengkap (aktor, aksi, entitas, IP), deteksi device offline, penandaan peminjaman overdue
-- Customer Service: ticketing user ↔ admin dengan status, prioritas, dan thread balasan
-- QR Code label inventaris per komponen (PNG/SVG, siap cetak)
-- Pengujian otomatis (Vitest + Supertest): auth, RBAC, peminjaman, inventori, audit, ticketing
+- Customer Service: ticketing dengan status, prioritas, thread balasan, dan notifikasi ke staff
+- QR Code label inventaris per komponen (PNG/SVG, siap cetak) + pemindaian QR cepat di halaman Inventori
+- Pengujian otomatis (Vitest + Supertest): auth, RBAC, peminjaman, inventori, audit, ticketing, laporan & surat peminjaman
+- E2E smoke test (headless browser) untuk pemindaian QR dan hak akses per peran
 
 ## Arsitektur
 
@@ -81,10 +83,11 @@ npm run dev                   # http://localhost:5173
 | Role | Username | Password |
 |---|---|---|
 | Admin | `admin` | `admin123` |
-| User | `mahasiswa1` | `user123` |
+| Dosen | *(tidak disertakan, buat melalui Admin)* | `dosen12345` |
+| Mahasiswa | `mahasiswa1` | `user123` |
 | User | `user` | `user123` |
 
-Login menerima **username, NIM, email, atau nomor HP** (field login berlabel `Username / NIM / Email / No. HP`).
+Login menerima **username, NIM, email, atau nomor HP** (field login berlabel `Username / NIM / Email / No. HP`). Role Dosen memiliki akses operasional lab (dashboard, kategori, perangkat, monitoring sensor, laporan, persetujuan peminjaman, ticketing) namun **tidak** memiliki akses Manajemen Pengguna dan Log Audit. Role Mahasiswa dan User (alias umum) setara sebagai peminjam.
 
 ## API Ringkas
 
@@ -94,8 +97,9 @@ Login menerima **username, NIM, email, atau nomor HP** (field login berlabel `Us
 | `POST /api/devices/register` | Public+Secret | ESP32 mendaftar, mendapat API key |
 | `POST /api/devices/heartbeat` | API Key | ESP32 memberi tanda online |
 | `POST /api/sensors/readings/batch` | API Key | ESP32 mengirim data sensor |
-| `GET /api/dashboard/summary` | JWT Admin | Statistik dashboard |
-| ... | | (Lengkap ada di `docs/API.md`) |
+| `GET /api/dashboard/summary` | JWT Staff | Statistik dashboard (Admin/Dosen) |
+| `GET /api/reports/:type` | JWT Staff | Laporan (json/csv/xlsx/pdf) |
+| `GET /api/loans/:id/letter` | JWT Staff | Surat peminjaman (json/pdf) |
 
 ## Testing
 
@@ -113,7 +117,7 @@ npm test              # sekali jalan
 npm run test:watch    # mode watch
 ```
 
-Cakupan test: autentikasi (username/NIM/email/HP, password salah, token tidak valid), RBAC, alur peminjaman (stok, approve, pengembalian, 422 stok kurang), komponen + stok + QR Code, log audit, ticketing (ownership, balasan, perubahan status), dan manajemen pengguna (NIM unik/opsional, login pakai NIM).
+Cakupan test: autentikasi (username/NIM/email/HP, password salah, token tidak valid), RBAC (Admin/Dosen/Mahasiswa/User), alur peminjaman (stok, approve, pengembalian, 422 stok kurang), komponen + stok + QR Code, log audit, ticketing (ownership, balasan, perubahan status), laporan (CSV/XLSX/PDF + filter), surat peminjaman, dan manajemen pengguna (NIM unik/opsional, login pakai NIM).
 
 ## Deployment (Production)
 
