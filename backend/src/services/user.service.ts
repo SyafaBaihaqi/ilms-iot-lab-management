@@ -3,7 +3,7 @@ import { hashPassword } from '../utils/jwt';
 import { RoleName } from '../constants/roles';
 
 export class UserService {
-  static async getAll(options: { search?: string; page?: number; limit?: number }) {
+  static async getAll(options: { search?: string; role?: string; status?: string; page?: number; limit?: number }) {
     const page = Math.max(1, Number(options.page) || 1);
     const limit = Math.max(1, Math.min(100, Number(options.limit) || 10));
     const skip = (page - 1) * limit;
@@ -16,6 +16,14 @@ export class UserService {
         { email: { contains: options.search, mode: 'insensitive' } },
         { nim: { contains: options.search, mode: 'insensitive' } }
       ];
+    }
+    if (options.role) {
+      where.role = { name: options.role };
+    }
+    if (options.status === 'active') {
+      where.isActive = true;
+    } else if (options.status === 'inactive') {
+      where.isActive = false;
     }
 
     const [total, users] = await Promise.all([

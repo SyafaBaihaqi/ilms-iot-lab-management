@@ -19,6 +19,8 @@ export default function UsersPage() {
   const [items, setItems] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
@@ -37,7 +39,13 @@ roleName: ROLE_MAHASISWA
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await request<any>('GET', `/users?search=${encodeURIComponent(search)}&page=${page}&limit=10`);
+      const params = new URLSearchParams();
+      if (search.trim()) params.set('search', search.trim());
+      if (roleFilter) params.set('role', roleFilter);
+      if (statusFilter) params.set('status', statusFilter);
+      params.set('page', String(page));
+      params.set('limit', '10');
+      const res = await request<any>('GET', `/users?${params.toString()}`);
       const itemsList = res.data?.items || (Array.isArray(res.data) ? res.data : []);
       const total = res.data?.meta?.totalPages || res.meta?.totalPages || 1;
       setItems(itemsList);
@@ -47,7 +55,7 @@ roleName: ROLE_MAHASISWA
     } finally {
       setLoading(false);
     }
-  }, [search, page]);
+  }, [search, roleFilter, statusFilter, page]);
 
   useEffect(() => {
     fetchData();
@@ -120,15 +128,58 @@ roleName: ROLE_MAHASISWA
         </button>
       </div>
 
-      <input
-        className="input max-w-xs"
-        placeholder="Cari nama / username / NIM / email..."
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setPage(1);
-        }}
-      />
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          className="input w-full sm:max-w-xs"
+          placeholder="Cari nama / username / NIM / email..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+        />
+        <select
+          className="input w-auto"
+          value={roleFilter}
+          onChange={(e) => {
+            setRoleFilter(e.target.value);
+            setPage(1);
+          }}
+        >
+          <option value="">Semua Role</option>
+          {ROLE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <select
+          className="input w-auto"
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setPage(1);
+          }}
+        >
+          <option value="">Semua Status</option>
+          <option value="active">Aktif</option>
+          <option value="inactive">Nonaktif</option>
+        </select>
+        {(search || roleFilter || statusFilter) && (
+          <button
+            type="button"
+            className="btn btn-secondary text-sm"
+            onClick={() => {
+              setSearch('');
+              setRoleFilter('');
+              setStatusFilter('');
+              setPage(1);
+            }}
+          >
+            Reset
+          </button>
+        )}
+      </div>
 
       {error && <div className="rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2">{error}</div>}
 

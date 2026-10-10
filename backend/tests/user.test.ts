@@ -182,3 +182,70 @@ describe('Manajemen pengguna - field NIM', () => {
     expect(res.body.data[0].action).toBe('user.create');
   });
 });
+
+describe('Manajemen pengguna - filter role dan status', () => {
+  let token = '';
+
+  beforeAll(async () => {
+    await resetDatabase();
+    await seedFixtures();
+    token = await login('admin', 'admin123');
+  });
+
+  afterAll(async () => {
+    await resetDatabase();
+    await disconnect();
+  });
+
+  it('filter berdasarkan role hanya mengembalikan role tersebut', async () => {
+    const res = await request(app).get('/api/users?role=Admin').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.items.length).toBeGreaterThan(0);
+    expect(res.body.data.items.every((u: any) => u.role.name === 'Admin')).toBe(true);
+  });
+
+  it('filter role tidak dikenal mengembalikan daftar kosong', async () => {
+    const res = await request(app).get('/api/users?role=Superhero').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.items).toHaveLength(0);
+  });
+
+  it('filter status=active hanya mengembalikan user aktif', async () => {
+    const res = await request(app).get('/api/users?status=active').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.items.every((u: any) => u.isActive === true)).toBe(true);
+  });
+
+  it('filter status=inactive menampilkan user yang dinonaktifkan', async () => {
+    const created = await createUser({
+      fullName: 'User Nonaktif',
+      email: 'nonaktif@ilms.test',
+      username: 'nonaktif1',
+      password: 'nonaktif123',
+      roleName: 'User'
+    });
+    expect(created.status).toBe(201);
+
+    await request(app)
+      .put(`/api/users/${created.body.data.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ isActive: false });
+
+    const res = await request(app).get('/api/users?status=inactive').set('Authorization', `Bearer ${token}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.items.some((u: any) => u.username === 'nonaktif1')).toBe(true);
+    expect(res.body.data.items.every((u: any) => u.isActive === false)).toBe(true);
+  });
+
+  it('filter role + status dapat digabung', async () => {
+    const res = await request(app)
+      .get('/api/users?role=User&status=inactive')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.items.every((u: any) => u.role.name === 'User' && u.isActive === false)).toBe(true);
+  });
+});
