@@ -15,7 +15,8 @@ Sistem manajemen laboratorium IoT berbasis web: manajemen inventaris komponen, p
 - Notifikasi in-app, log audit lengkap (aktor, aksi, entitas, IP), deteksi device offline, penandaan peminjaman overdue
 - Customer Service: ticketing dengan status, prioritas, thread balasan, dan notifikasi ke staff
 - QR Code label inventaris per komponen (PNG/SVG, siap cetak) + pemindaian QR cepat di halaman Inventori
-- Pengujian otomatis (Vitest + Supertest): auth, RBAC, peminjaman, inventori, audit, ticketing, laporan & surat peminjaman
+- Portofolio proyek elektronik/IoT: penandaan Featured/Star/Trending, section karya mahasiswa, identitas author, dan penambahan proyek oleh Admin (peran lain hanya melihat)
+- Pengujian otomatis (Vitest + Supertest): auth, RBAC, peminjaman, inventori, audit, ticketing, laporan & surat peminjaman, portofolio proyek
 - E2E smoke test (headless browser) untuk pemindaian QR dan hak akses per peran
 
 ## Arsitektur
@@ -100,6 +101,8 @@ Login menerima **username, NIM, email, atau nomor HP** (field login berlabel `Us
 | `GET /api/dashboard/summary` | JWT Staff | Statistik dashboard (Admin/Dosen) |
 | `GET /api/reports/:type` | JWT Staff | Laporan (json/csv/xlsx/pdf) |
 | `GET /api/loans/:id/letter` | JWT Staff | Surat peminjaman (json/pdf) |
+| `GET /api/projects` | JWT (semua peran) | Daftar proyek portofolio (filter highlight/mahasiswa) |
+| `POST /api/projects` | JWT Admin | Tambah proyek beserta identitas author |
 
 ## Testing
 

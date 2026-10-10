@@ -40,6 +40,8 @@ model User {
   tickets      Ticket[]                @relation("UserTickets")
   assignedTickets Ticket[]              @relation("AssignedTickets")
   ticketMessages TicketMessage[]        @relation("TicketMessages")
+  authoredProjects Project[]            @relation("AuthoredProjects")
+  createdProjects  Project[]            @relation("CreatedProjects")
 
   @@index([roleId], map: "idx_users_role_id")
   @@index([email], map: "idx_users_email")
@@ -220,6 +222,37 @@ model SensorReading {
 
   @@index([deviceId, recordedAt], map: "idx_sensor_readings_device_time")
   @@map("sensor_readings")
+}
+
+model Project {
+  id               String    @id @default(uuid())
+  title            String    @db.VarChar(150)
+  category         String    @db.VarChar(50)
+  description      String
+  techStack        String?   @map("tech_stack") @db.VarChar(255)
+  repoUrl          String?   @map("repo_url") @db.VarChar(255)
+  demoUrl          String?   @map("demo_url") @db.VarChar(255)
+  imageUrl         String?   @map("image_url") @db.VarChar(255)
+  year             String?   @db.VarChar(10)
+  tags             String[]  @default([])
+  highlights       String[]  @default([])
+  isStudentProject Boolean   @default(false) @map("is_student_project")
+  authorId         String?   @map("author_id")
+  authorName       String    @map("author_name") @db.VarChar(100)
+  authorRole       String?   @map("author_role") @db.VarChar(50)
+  authorNim        String?   @map("author_nim") @db.VarChar(20)
+  createdById      String?   @map("created_by_id")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  author    User? @relation("AuthoredProjects", fields: [authorId], references: [id], onDelete: SetNull)
+  createdBy User? @relation("CreatedProjects", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([isStudentProject], map: "idx_projects_is_student")
+  @@index([deletedAt], map: "idx_projects_deleted_at")
+  @@index([category], map: "idx_projects_category")
+  @@map("projects")
 }
 
 model Notification {

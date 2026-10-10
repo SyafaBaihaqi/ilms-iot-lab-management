@@ -20,6 +20,7 @@ export const resetDatabase = async () => {
   await prisma.category.deleteMany();
   await prisma.sensorReading.deleteMany();
   await prisma.device.deleteMany();
+  await prisma.project.deleteMany();
   await prisma.user.deleteMany();
 };
 

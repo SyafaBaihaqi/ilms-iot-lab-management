@@ -304,6 +304,87 @@ async function main() {
 
   console.log('Sample device created:', device.deviceName, `(API Key for testing: ${apiKeyRaw})`);
 
+  // 6. Sample Projects (portofolio elektronik/IoT)
+  const projectCount = await prisma.project.count();
+  if (projectCount === 0) {
+    const sampleProjects = [
+      {
+        title: 'ILMS - IoT Lab Management System',
+        category: 'Web + IoT',
+        description:
+          'Sistem manajemen laboratorium IoT: inventaris, peminjaman, laporan multi-format, surat peminjaman, QR code, ticketing, log audit, RBAC, dan integrasi perangkat ESP32.',
+        techStack: 'React, TypeScript, Express, Prisma, PostgreSQL, ESP32',
+        repoUrl: 'https://github.com/SyafaBaihaqi/ilms-iot-lab-management',
+        demoUrl: 'https://ilms.saiasyap.my.id',
+        year: '2026',
+        tags: ['Fullstack', 'IoT', 'RBAC', 'Reports'],
+        highlights: ['Featured', 'Star'],
+        isStudentProject: false,
+        authorId: adminUser.id,
+        authorName: adminUser.fullName,
+        authorRole: 'Admin',
+        authorNim: null,
+        createdById: adminUser.id
+      },
+      {
+        title: 'Monitoring Suhu & Kelembaban Berbasis ESP32',
+        category: 'IoT',
+        description:
+          'Alat pemantau suhu dan kelembaban ruangan menggunakan ESP32 dan sensor DHT22, data dikirim ke dashboard dan disimpan ke database.',
+        techStack: 'ESP32, DHT22, Arduino, HTTP API',
+        repoUrl: 'https://project.saiasyap.my.id',
+        year: '2025',
+        tags: ['IoT', 'Sensor', 'Monitoring'],
+        highlights: ['Featured'],
+        isStudentProject: true,
+        authorId: studentUser.id,
+        authorName: studentUser.fullName,
+        authorRole: 'Mahasiswa',
+        authorNim: '2022103',
+        createdById: adminUser.id
+      },
+      {
+        title: 'Smart Garden - Penyiraman Otomatis IoT',
+        category: 'IoT',
+        description:
+          'Prototipe penyiraman otomatis berbasis ESP32 dengan sensor kelembaban tanah dan relay pompa untuk efisiensi air.',
+        techStack: 'ESP32, Soil Moisture, Relay',
+        year: '2025',
+        tags: ['Automation', 'IoT', 'Embedded'],
+        highlights: ['Trending'],
+        isStudentProject: true,
+        authorId: studentUser.id,
+        authorName: studentUser.fullName,
+        authorRole: 'Mahasiswa',
+        authorNim: '2022103',
+        createdById: adminUser.id
+      },
+      {
+        title: 'Line Follower Robot Analog',
+        category: 'Robotika',
+        description:
+          'Robot pengikut garis berbasis sensor inframerah dan kontrol motor DC sebagai media pembelajaran dasar kendali otomatis.',
+        techStack: 'Arduino Uno, Sensor IR, Driver L298N',
+        year: '2024',
+        tags: ['Robotika', 'Arduino'],
+        highlights: ['Star'],
+        isStudentProject: true,
+        authorId: studentUser.id,
+        authorName: studentUser.fullName,
+        authorRole: 'Mahasiswa',
+        authorNim: '2022103',
+        createdById: adminUser.id
+      }
+    ];
+
+    for (const p of sampleProjects) {
+      await prisma.project.create({ data: p });
+    }
+    console.log(`Sample projects created: ${sampleProjects.length} items.`);
+  } else {
+    console.log(`Projects already exist (${projectCount}). Skipping sample projects.`);
+  }
+
   console.log('Seeding finished successfully.');
 }
 

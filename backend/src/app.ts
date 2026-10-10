@@ -16,6 +16,7 @@ import reportRoutes from './routes/report.routes';
 import notificationRoutes from './routes/notification.routes';
 import ticketRoutes from './routes/ticket.routes';
 import auditRoutes from './routes/audit.routes';
+import projectRoutes from './routes/project.routes';
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
 import { startAllJobs } from './jobs';
 
@@ -77,6 +78,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/audit-logs', auditRoutes);
+app.use('/api/projects', projectRoutes);
 
 // ===== 404 & Error Handler =====
 app.use(notFoundHandler);

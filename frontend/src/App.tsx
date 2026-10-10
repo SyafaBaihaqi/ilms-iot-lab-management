@@ -3,6 +3,8 @@ import { ProtectedRoute, PublicOnlyRoute } from './routes/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
+import ProjectsPage from './pages/ProjectsPage';
+import ShowcasePage from './pages/ShowcasePage';
 import InventoryPage from './pages/InventoryPage';
 import CategoriesPage from './pages/CategoriesPage';
 import LoansPage from './pages/LoansPage';
@@ -34,6 +36,8 @@ export default function App() {
           <Route element={<AppLayout />}>
             {/* Semua peran punya dashboard sendiri sesuai perannya */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/showcase" element={<ShowcasePage />} />
 
             {/* Dosen dan Admin boleh masuk */}
             <Route element={<ProtectedRoute allowedRoles={STAFF} />}>
