@@ -1,0 +1,32 @@
+IoT Lab Management System (ILMS)
+
+PRESENTASI SINGKAT (1–2 Menit)
+
+1. LATAR BELAKANG (15 detik)
+ILMS adalah sistem manajemen laboratorium IoT berbasis web untuk mengelola inventaris komponen, alur peminjaman-pengembalian, perangkat IoT, dan monitoring data sensor. Tujuannya untuk menggantikan pencatatan manual menjadi sistem terpusat, terstruktur, dan dapat diaudit.
+
+2. PROBLEMATIKA YANG DISELESAIKAN (15 detik)
+Permasalahan di laboratorium: pencatatan stok komponen masih manual, sulit melacak siapa yang meminjam, risiko stok kurang terdeteksi, peminjaman terlambat tidak terpantau, serta sulit menghasilkan laporan untuk kebutuhan administrasi dan audit. ILMS menjawab semua masalah tersebut dengan mekanisme terotomatisasi.
+
+3. FITUR UTAMA (45 detik)
+- Manajemen inventaris & stok real-time dengan riwayat perubahan stok.
+- Alur peminjaman terstruktur: pengajuan → persetujuan (Admin/Dosen) → peminjaman → pengembalian, dengan validasi stok dalam transaksi database.
+- RBAC terperinci: Admin (penuh), Dosen (operasional lab, tanpa pengelolaan pengguna & log audit), Mahasiswa dan User (peminjam).
+- Laporan lengkap: Inventaris, Peminjaman, Kerusakan, IoT. Bisa diekspor ke CSV, Excel (.xlsx), dan PDF (multi-halaman). Tersedia juga Surat Peminjaman per transaksi (PDF).
+- Dashboard adaptif per peran: Admin/Dosen, Mahasiswa, dan User sederhana.
+- Customer Service (ticketing) dengan thread balasan dan notifikasi ke staff.
+- QR Code label komponen + scan cepat di halaman Inventori.
+- IoT (ESP32): registrasi perangkat, heartbeat, dan pengiriman data sensor terpisah via API key khusus.
+- PWA, log audit, notifikasi in-app, deteksi device offline, dan penandaan peminjaman terlambat.
+
+4. TEKNOLOGI & ARSITEKTUR (20 detik)
+Frontend: React + Vite + TypeScript + Tailwind, PWA (Workbox).
+Backend: Node.js + Express + TypeScript + Zod + JWT + Prisma ORM.
+Database: PostgreSQL.
+IoT: ESP32 (ArduinoJson). Arsitektur terpisah antara API web dan endpoint IoT berbasis API key untuk keamanan.
+
+5. KUALITAS & IMPLEMENTASI (15 detik)
+Terdapat 82 test otomatis (Vitest + Supertest) dengan database terpisah (ilms_test), type-safe dengan TypeScript, validasi input, dan mekanisme RBAC ketat. Sudah dilengkapi E2E smoke test untuk QR dan hak akses per peran.
+
+6. PENUTUP (10 detik)
+ILMS merupakan solusi terintegrasi untuk manajemen laboratorium IoT: terstruktur, terdokumentasi, mudah di-deploy, dan siap dikembangkan lebih lanjut.
