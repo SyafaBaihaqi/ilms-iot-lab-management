@@ -1,41 +1,46 @@
 SCENARIO PENYAMPAIAN PRESENTASI ILMS
-(Durasi Estimasi: ±2 Menit)
+(Durasi Estimasi: +-2 Menit)
 
 Pembicara: [Nama]
 Topik: IoT Lab Management System (ILMS)
 
-SLIDE 1 – COVER (0:00 – 0:05)
+SLIDE 1 - COVER (0:00 - 0:05)
 - Judul: "IoT Lab Management System (ILMS)"
 - Subjudul: "Sistem Manajemen Laboratorium IoT Berbasis Web"
-- Penyampaian: "Hari ini saya akan mempresentasikan ILMS, sebuah sistem manajemen laboratorium IoT berbasis web yang bertujuan untuk mengotomatisasi pengelolaan inventaris dan peminjaman komponen di laboratorium."
+- Penyampaian: "Hari ini saya akan mempresentasikan ILMS, sebuah sistem manajemen laboratorium IoT berbasis web yang mengotomatisasi pengelolaan inventaris, peminjaman komponen, monitoring perangkat, dan portofolio proyek di laboratorium."
 
-SLIDE 2 – LATAR BELAKANG & MASALAH (0:05 – 0:20)
-- (Latar belakang) "Saat ini, pengelolaan komponen laboratorium IoT masih banyak dilakukan secara manual, seperti pencatatan di buku atau spreadsheet."
-- (Permasalahan) "Hal ini menimbulkan beberapa kendala: sulit melacak siapa yang meminjam komponen, stok sering tidak terupdate secara real-time, peminjaman yang terlambat sulit dipantau, serta sulit menghasilkan laporan untuk kebutuhan audit dan administrasi."
-- (Solusi) "Oleh karena itu, dibutuhkan sistem terpusat yang dapat mencatat setiap transaksi secara terstruktur dan terdokumentasi."
+SLIDE 2 - LATAR BELAKANG & MASALAH (0:05 - 0:20)
+- (Latar belakang) "Saat ini pengelolaan komponen laboratorium IoT masih banyak dilakukan secara manual, seperti pencatatan di buku atau spreadsheet."
+- (Permasalahan) "Hal ini menimbulkan beberapa kendala: sulit melacak siapa yang meminjam komponen, stok tidak terupdate real-time, peminjaman terlambat sulit dipantau, dokumentasi proyek mahasiswa berserakan, serta sulit menghasilkan laporan untuk audit dan administrasi."
+- (Solusi) "Dibutuhkan sistem terpusat yang mencatat setiap transaksi secara terstruktur dan terdokumentasi."
 
-SLIDE 3 – TUJUAN & SOLUSI (0:20 – 0:35)
-- "ILMS hadir untuk mengatasi permasalahan tersebut dengan menyediakan sistem terintegrasi yang menghubungkan manajemen inventaris, peminjaman, perangkat IoT, serta monitoring dalam satu platform berbasis web."
-- "Seluruh transaksi dicatat dalam database dengan jaminan konsistensi, sehingga data bisa dipertanggungjawabkan untuk keperluan audit."
+SLIDE 3 - TUJUAN & SOLUSI (0:20 - 0:35)
+- "ILMS menghubungkan manajemen inventaris, peminjaman, perangkat IoT, monitoring, dan portofolio proyek dalam satu platform berbasis web."
+- "Seluruh transaksi dicatat dalam database dengan jaminan konsistensi, sehingga data bisa dipertanggungjawabkan untuk audit."
 
-SLIDE 4 – FITUR UTAMA (0:35 – 1:15)
-- (Inventaris & Stok) "Sistem ini memiliki manajemen inventaris dengan stok real-time dan riwayat perubahan stok untuk menjaga akurasi data."
-- (Peminjaman) "Terdapat alur peminjaman terstruktur, mulai dari pengajuan mahasiswa, persetujuan oleh Admin atau Dosen, hingga proses pengembalian. Validasi stok dilakukan dalam satu transaksi database untuk mencegah overdraft."
-- (RBAC) "Hak akses dibagi menjadi empat peran: Admin (akses penuh), Dosen (operasional laboratorium, tanpa akses manajemen pengguna dan log audit), Mahasiswa dan User (alias umum) sebagai peminjam."
-- (Laporan & Surat Peminjaman) "Fitur laporan mencakup Inventaris, Peminjaman, Kerusakan, dan IoT. Laporan dapat diekspor dalam format CSV, Excel (.xlsx), maupun PDF multi-halaman. Selain itu, tersedia juga Surat Peminjaman komponen per transaksi dalam format PDF."
-- (Dashboard) "Tampilan dashboard disesuaikan per peran, sehingga informasi yang ditampilkan relevan dengan kebutuhan masing-masing pengguna."
-- (Pendukung) "Dilengkapi Customer Service (ticketing), QR Code label komponen beserta pemindaian cepat, integrasi IoT (ESP32) dengan pemisahan endpoint berbasis API Key, serta PWA dan Log Audit untuk keamanan."
+SLIDE 4 - FITUR UTAMA (0:35 - 1:15)
+- (Inventaris & Stok) "Manajemen inventaris dengan stok real-time dan riwayat perubahan stok untuk menjaga akurasi data."
+- (Peminjaman) "Alur peminjaman terstruktur: pengajuan mahasiswa, persetujuan Admin atau Dosen, hingga pengembalian. Validasi stok dilakukan dalam satu transaksi database untuk mencegah overdraft."
+- (RBAC) "Hak akses dibagi empat peran: Admin (akses penuh), Dosen (operasional laboratorium, tanpa manajemen pengguna dan log audit), Mahasiswa dan User (alias umum) sebagai peminjam."
+- (Manajemen Pengguna) "Halaman pengguna memiliki filter berdasarkan role dan status aktif/nonaktif, plus pencarian nama, username, NIM, atau email."
+- (Laporan & Surat Peminjaman) "Laporan mencakup Inventaris, Peminjaman, Kerusakan, dan IoT, dapat diekspor ke CSV, Excel, dan PDF multi-halaman. Tersedia Surat Peminjaman per transaksi dalam format PDF."
+- (Dashboard) "Tampilan dashboard disesuaikan per peran, sehingga informasi relevan dengan kebutuhan masing-masing pengguna."
+- (Portofolio Proyek) "Terdapat halaman Proyek untuk hasil elektronik/IoT: penandaan Featured, Proyek Terpilih (Star/Trending), section Proyek Mahasiswa, dan identitas author. Proyek hanya bisa ditambah atau diubah oleh Admin, peran lain hanya melihat. Ada juga halaman Showcase yang menampilkan project.saiasyap.my.id."
+- (Pendukung) "Dilengkapi Customer Service (ticketing), QR Code label komponen beserta pemindaian cepat, integrasi IoT ESP32 berbasis API Key, PWA, dan Log Audit untuk keamanan."
 
-SLIDE 5 – TEKNOLOGI YANG DIGUNAKAN (1:15 – 1:30)
-- (Frontend) "Bagian frontend dibangun menggunakan React, Vite, TypeScript, dan Tailwind CSS dengan dukungan Progressive Web App (PWA)."
+SLIDE 5 - TEKNOLOGI YANG DIGUNAKAN (1:15 - 1:30)
+- (Frontend) "Frontend dibangun dengan React, Vite, TypeScript, dan Tailwind CSS dengan dukungan Progressive Web App (PWA)."
 - (Backend) "Backend menggunakan Node.js, Express, TypeScript, Zod untuk validasi, JWT untuk autentikasi, serta Prisma ORM untuk akses database."
-- (Database & IoT) "Menggunakan PostgreSQL sebagai basis data, serta terintegrasi dengan perangkat ESP32 untuk pengiriman data sensor secara terpisah dan aman."
+- (Database & IoT) "Database menggunakan PostgreSQL, terintegrasi dengan perangkat ESP32 yang mengirim data sensor secara terpisah dan aman."
 
-SLIDE 6 – KUALITAS, TESTING & DEMO (1:30 – 1:45)
-- "Dari sisi kualitas, sistem ini memiliki 82 test otomatis menggunakan Vitest dan Supertest dengan database terpisah, sehingga tidak mengganggu data produksi. Tersedia juga E2E smoke test untuk pengujian pemindaian QR dan hak akses per peran."
+SLIDE 5b - ARSITEKTUR IOT (opsional, 1:15 - 1:25)
+- "ESP32 terhubung melalui endpoint khusus berbasis API Key: registrasi perangkat, heartbeat untuk status online, dan pengiriman data sensor secara batch. Data langsung tampil di Monitoring Sensor dan Laporan IoT."
+
+SLIDE 6 - KUALITAS, TESTING & DEMO (1:25 - 1:45)
+- "Dari sisi kualitas, sistem ini memiliki 97 test otomatis dengan Vitest dan Supertest pada database terpisah, sehingga tidak mengganggu data produksi. Tersedia pula E2E smoke test untuk pemindaian QR dan hak akses per peran."
 - "Seluruh kode telah melalui pengecekan TypeScript tanpa error, menjaga konsistensi dan mengurangi potensi bug."
-- (Opsional Demo) "Dapat ditunjukkan secara singkat: login sesuai peran, alur peminjaman, ekspor laporan PDF/Excel, atau pemindaian QR pada halaman inventori."
+- (Opsional Demo) "Dapat ditunjukkan singkat: login sesuai peran, alur peminjaman, ekspor laporan PDF/Excel, pemindaian QR inventori, atau menambah satu proyek baru dari akun Admin."
 
-SLIDE 7 – PENUTUP (1:45 – 2:00)
-- "Kesimpulannya, ILMS merupakan solusi terintegrasi, terstruktur, terdokumentasi, dan siap untuk di-deploy maupun dikembangkan lebih lanjut."
+SLIDE 7 - PENUTUP (1:45 - 2:00)
+- "Kesimpulannya, ILMS adalah solusi terintegrasi, terstruktur, terdokumentasi, dan siap di-deploy maupun dikembangkan lebih lanjut."
 - "Terima kasih atas perhatian. Saya siap menerima pertanyaan."
