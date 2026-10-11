@@ -27,6 +27,9 @@ frontend/vite.config.d.ts
 .DS_Store
 Thumbs.db
 
+# Materi pribadi / arsip (blueprint, percakapan, presentasi, launcher)
+others/
+
 # Logs
 *.log
 npm-debug.log*

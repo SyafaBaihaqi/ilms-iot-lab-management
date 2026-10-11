@@ -18,7 +18,7 @@ Sistem manajemen laboratorium IoT berbasis web: manajemen inventaris komponen, p
 - QR Code label inventaris per komponen (PNG/SVG, siap cetak) + pemindaian QR cepat di halaman Inventori
 - Portofolio proyek elektronik/IoT: penandaan Featured/Star/Trending, Proyek Mahasiswa, identitas author, dan pengelolaan (tambah/ubah/hapus) khusus Admin (peran lain hanya melihat)
 - Halaman Showcase: menyematkan website portofolio eksternal (`project.saiasyap.my.id`)
-- Panduan menghubungkan ESP32 ke website (`Panduan_Hubungkan_ESP32_Ke_Website_ILMS.txt`)
+- Panduan menghubungkan ESP32 ke website (`panduan/Panduan_Hubungkan_ESP32_Ke_Website_ILMS.txt`)
 - Pengujian otomatis (Vitest + Supertest): 97 test pada DB terpisah, mencakup auth, RBAC, peminjaman, inventori, audit, ticketing, laporan & surat peminjaman, portofolio proyek, filter pengguna
 - E2E smoke test (headless browser) untuk pemindaian QR dan hak akses per peran
 
