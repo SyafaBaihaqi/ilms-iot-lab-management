@@ -6,6 +6,7 @@ Sistem manajemen laboratorium IoT berbasis web: manajemen inventaris komponen, p
 
 - Autentikasi & RBAC (Admin / Dosen / Mahasiswa / User) dengan JWT + Refresh Token
 - Manajemen komponen, kategori, stok real-time, dan riwayat stok
+- Manajemen pengguna dengan filter role & status (aktif/nonaktif) serta pencarian nama/username/NIM/email
 - Alur peminjaman-pengembalian (ajukan → approve/reject → return) yang dibungkus transaksi database
 - Dashboard statistik (Admin/Dosen), Dashboard Mahasiswa, dan Dashboard sederhana untuk User
 - Laporan inventaris/peminjaman/kerusakan/IoT dengan ekspor CSV, Excel (.xlsx), dan PDF (multi halaman)
@@ -15,8 +16,10 @@ Sistem manajemen laboratorium IoT berbasis web: manajemen inventaris komponen, p
 - Notifikasi in-app, log audit lengkap (aktor, aksi, entitas, IP), deteksi device offline, penandaan peminjaman overdue
 - Customer Service: ticketing dengan status, prioritas, thread balasan, dan notifikasi ke staff
 - QR Code label inventaris per komponen (PNG/SVG, siap cetak) + pemindaian QR cepat di halaman Inventori
-- Portofolio proyek elektronik/IoT: penandaan Featured/Star/Trending, section karya mahasiswa, identitas author, dan penambahan proyek oleh Admin (peran lain hanya melihat)
-- Pengujian otomatis (Vitest + Supertest): auth, RBAC, peminjaman, inventori, audit, ticketing, laporan & surat peminjaman, portofolio proyek
+- Portofolio proyek elektronik/IoT: penandaan Featured/Star/Trending, Proyek Mahasiswa, identitas author, dan pengelolaan (tambah/ubah/hapus) khusus Admin (peran lain hanya melihat)
+- Halaman Showcase: menyematkan website portofolio eksternal (`project.saiasyap.my.id`)
+- Panduan menghubungkan ESP32 ke website (`Panduan_Hubungkan_ESP32_Ke_Website_ILMS.txt`)
+- Pengujian otomatis (Vitest + Supertest): 97 test pada DB terpisah, mencakup auth, RBAC, peminjaman, inventori, audit, ticketing, laporan & surat peminjaman, portofolio proyek, filter pengguna
 - E2E smoke test (headless browser) untuk pemindaian QR dan hak akses per peran
 
 ## Arsitektur
@@ -101,7 +104,9 @@ Login menerima **username, NIM, email, atau nomor HP** (field login berlabel `Us
 | `GET /api/dashboard/summary` | JWT Staff | Statistik dashboard (Admin/Dosen) |
 | `GET /api/reports/:type` | JWT Staff | Laporan (json/csv/xlsx/pdf) |
 | `GET /api/loans/:id/letter` | JWT Staff | Surat peminjaman (json/pdf) |
+| `GET /api/users` | JWT Admin | Daftar pengguna (filter `role`, `status`, `search`) |
 | `GET /api/projects` | JWT (semua peran) | Daftar proyek portofolio (filter highlight/mahasiswa) |
+| `GET /api/projects/stats` | JWT (semua peran) | Statistik proyek (total/featured/mahasiswa) |
 | `POST /api/projects` | JWT Admin | Tambah proyek beserta identitas author |
 
 ## Testing
@@ -120,7 +125,7 @@ npm test              # sekali jalan
 npm run test:watch    # mode watch
 ```
 
-Cakupan test: autentikasi (username/NIM/email/HP, password salah, token tidak valid), RBAC (Admin/Dosen/Mahasiswa/User), alur peminjaman (stok, approve, pengembalian, 422 stok kurang), komponen + stok + QR Code, log audit, ticketing (ownership, balasan, perubahan status), laporan (CSV/XLSX/PDF + filter), surat peminjaman, dan manajemen pengguna (NIM unik/opsional, login pakai NIM).
+Cakupan test: autentikasi (username/NIM/email/HP, password salah, token tidak valid), RBAC (Admin/Dosen/Mahasiswa/User), alur peminjaman (stok, approve, pengembalian, 422 stok kurang), komponen + stok + QR Code, log audit, ticketing (ownership, balasan, perubahan status), laporan (CSV/XLSX/PDF + filter), surat peminjaman, manajemen pengguna (NIM unik/opsional, login pakai NIM, filter role & status), dan portofolio proyek (CRUD admin, filter highlight/mahasiswa, identitas author).
 
 ## Deployment (Production)
 
@@ -141,7 +146,7 @@ Semua panduan dipisah per kategori di folder **`panduan/`**:
 | `panduan/01_MENJALANKAN_Lokal.txt` | Menjalankan lokal (Docker + backend :5000 + frontend :5173) |
 | `panduan/02_MENJALANKAN_Online.txt` | Menjalankan online (bat file, tunnel, domain publik) |
 | `panduan/03_DATABASE_Prisma.txt` | Koneksi DB, `prisma db push`, seed, reset total |
-| `panduan/04_TESTING_Otomatis.txt` | Menjalankan 58 test otomatis (Vitest + Supertest) |
+| `panduan/04_TESTING_Otomatis.txt` | Menjalankan 97 test otomatis (Vitest + Supertest) |
 | `panduan/05_DEBUGGING_Troubleshooting.txt` | Semua error & solusinya (PowerShell, port, DB, tunnel) |
 | `panduan/06_DEPLOYMENT_Gratis_24-7.txt` | Hosting permanen gratis (Neon + Render + Vercel) |
 | `panduan/07_AKUN_DEMO_dan_URL.txt` | Akun demo, URL penting, API key IoT, endpoint demo |
