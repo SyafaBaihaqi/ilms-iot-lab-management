@@ -14,7 +14,8 @@ frontend/.env.local
 frontend/.env.*.local
 
 # JANGAN commit kredensial asli (git tidak mendukung komentar di akhir baris)
-iot/esp32/config.h
+iot/**/config.h
+iot/Smart Enviroment Monitor/SmartEnvMonitor/config.h
 
 # TypeScript build info & file hasil tsc
 *.tsbuildinfo
