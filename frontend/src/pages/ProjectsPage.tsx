@@ -447,16 +447,6 @@ export default function ProjectsPage() {
         renderGrid(studentProjects, 'Belum ada proyek mahasiswa.')
       )}
 
-      <div className="card p-4">
-        <p className="text-sm text-slate-600">
-          Website showcase: {' '}
-          <a href="https://project.saiasyap.my.id/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-            project.saiasyap.my.id
-          </a>{' '}
-          (belum dikembangkan lebih lanjut)
-        </p>
-      </div>
-
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

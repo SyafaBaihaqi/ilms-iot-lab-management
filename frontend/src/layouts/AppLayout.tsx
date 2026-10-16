@@ -16,7 +16,6 @@ const navItems: { to: string; label: string; icon: string; roles: RoleName[] }[]
   { to: '/reports', label: 'Laporan', icon: '📄', roles: STAFF },
   { to: '/audit-logs', label: 'Log Audit', icon: '🕵️', roles: [ROLE_ADMIN] },
   { to: '/projects', label: 'Proyek', icon: '🚀', roles: ALL },
-  { to: '/showcase', label: 'Showcase', icon: '🌐', roles: ALL },
   { to: '/support', label: 'Customer Service', icon: '🎧', roles: ALL },
   { to: '/users', label: 'Pengguna', icon: '👥', roles: [ROLE_ADMIN] }
 ];
