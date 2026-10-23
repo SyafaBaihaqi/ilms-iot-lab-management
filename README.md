@@ -159,3 +159,4 @@ PDF laporan & surat peminjaman, email notifikasi, deteksi anomali sensor, MQTT, 
 ---
 
 *Proyek pengembangan sebagai portfolio studi kasus manajemen laboratorium IoT.*
+*Fun Fact: Seluruh komponen yang tersedia pada aplikasi ILMS ini didasarkan pada komponen yang saya miliki secara pribadi*
