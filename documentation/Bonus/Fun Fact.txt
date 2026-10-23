@@ -1,6 +1,10 @@
-FUN FACT
+Fun Fact Buat Bapak Dosen dan Teman-teman Nih.
 
-Seluruh komponen yang terdaftar pada aplikasi ILMS ini didasarkan pada
-komponen yang saya miliki secara pribadi, bukan data karangan.
+Mau tau nggak? Sebenernya semua komponen yang ada di aplikasi ILMS ini bukan data karangan loh ya. Semua fisiknya saya punya kok hehe.Saya mulai beli sendiri pelan-pelan, awalnya saya hanya memiliki 1 ESP32 dan beberapa Sensor sederhana. Namun sekarang, Alhamdulillah saya sudah memiliki banyak variasi mikrokontroller dan sensor, serta komponen lain. Tiap kali ada ide fitur, saya biasanya bikin skematiknya dulu di Fritzing, kalau pengen direalisasikan yaa langsung nyolder ajah hehe.
 
-Bukti: lihat foto "Komponen Milik Pribadi.jpg" pada folder yang sama.
+Tujuan kecil saya tuh pengen nunjukin ke teman-teman dan ke Bapak Dosen kalau laboratorium itu bisa diakses kapan aja lewat web, nggak harus nunggu jam praktikum. Semoga bisa menginspirasi mahasiswa lain buat berani mulai dari barang seadanya, modal nekat sama konsisten itu lebih penting daripada peralatan mahal.
+
+Semisal nih, kalo Temen-Temen penasaran tentang IoT. Ayo belajar bareng aja :)  
+Kalau bisa, saya pinjamin juga komponen yang saya miliki. Jadi, Enjoy aja...
+
+Bukti fisiknya: bisa cek foto "Komponen Milik Pribadi.jpg" di folder ini ya...
