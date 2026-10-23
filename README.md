@@ -50,8 +50,11 @@ ilms/
 │       ├── validators/
 │       └── jobs/
 ├── frontend/         # React PWA
-├── iot/esp32/        # Firmware ESP32 (Arduino / PlatformIO)
+├── iot/esp32/        # Firmware ESP32 versi PlatformIO (PlatformIO)
+├── iot/Smart Enviroment Monitor/  # Firmware ESP32 SmartEnvMonitor (Arduino IDE)
 ├── database/         # DDL PostgreSQL manual
+├── documentation/    # Tangkapan layar antarmuka per peran
+├── panduan/          # Panduan operasional (.txt)
 └── docs/
 ```
 
@@ -151,6 +154,39 @@ Semua panduan dipisah per kategori di folder **`panduan/`**:
 | `panduan/07_AKUN_DEMO_dan_URL.txt` | Akun demo, URL penting, API key IoT, endpoint demo |
 | `panduan/08_STRUKTUR_Project.txt` | Struktur folder, teknologi, alur request, daftar fitur |
 | `panduan/09_CHEATSHEET_Perintah.txt` | Perintah cepat siap copy-paste |
+
+## Dokumentasi Visual (`documentation/`)
+
+Tangkapan layar antarmuka ILMS per peran untuk laporan/presentasi. Semua berkas PNG ada di folder **`documentation/`**.
+
+![Dashboard Admin](<documentation/Admin/1.1 Dashboard Admin.png>)
+
+**Halaman umum**
+- [Login Page](<documentation/1. Login Page.png>)
+- [Daftar komponen](<documentation/2. Daftar komponen.png>)
+- [Daftar project yang dipublikasi](<documentation/3. Daftar project yang dipublikasi.png>)
+
+**Admin**
+- [Dashboard Admin](<documentation/Admin/1.1 Dashboard Admin.png>)
+- [Update informasi di Dashboard](<documentation/Admin/1.2 Update indormasi di Dashboard.png>)
+- [Tambah komponen](<documentation/Admin/2. Tambah komponen.png>)
+- [Kelola kategori](<documentation/Admin/3. Kelola kategori.png>)
+- [Kelola peminjaman](<documentation/Admin/4. Kelola Peminjaman.png>)
+- [Daftar mikrokontroller terverifikasi](<documentation/Admin/5. Daftar mikrokontroller yang terverifikasi.png>)
+- [Monitoring perangkat](<documentation/Admin/6. Monitoring perangkat.png>)
+- [Laporan (pengembangan lebih lanjut)](<documentation/Admin/7. Laporan (pengembangan lebih lanjut).png>)
+- [Log audit](<documentation/Admin/8. Log audit.png>)
+- [Tambah proyek yang dipublikasi](<documentation/Admin/9. Tambah proyek yang ingin dipublikasi.png>)
+- [Kelola tiket/konsultasi](<documentation/Admin/10.1 Kelola tiket atau konsultasi.png>)
+- [Proses konsultasi](<documentation/Admin/10.2 Proses konsultasi.png>)
+- [Kelola pengguna](<documentation/Admin/11.1Kelola pengguna.png>)
+- [Tambah pengguna](<documentation/Admin/11.2 Tambah Pengguna.png>)
+
+**Mahasiswa**
+- [Dashboard Mahasiswa](<documentation/Mahasiswa/1. Dashboard Mahasiswa.png>)
+- [Ajukan peminjaman](<documentation/Mahasiswa/2. Ajukan Peminjaman.png>)
+- [Ajukan tiket/konsultasi](<documentation/Mahasiswa/3.1 Ajukan tiket atau konsultasi.png>)
+- [Proses konsultasi](<documentation/Mahasiswa/3.2 Proses konsultasi.png>)
 
 ## Future Development
 
